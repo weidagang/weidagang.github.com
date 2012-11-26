@@ -348,7 +348,7 @@ var html_render = (function() {
 		out_cimage.push(_cpoint('/', 0, 0, 0));
 		out_cimage.push(_cpoint('-', x - 1, 0, 0));
 		out_cimage.push(_cpoint('-', 0, 2, 0));
-		out_cimage.push(_cpoint('/', x - 1, 2, 0));
+		out_cimage.push(_cpoint('-', x - 1, 2, 0));
 		for (i = 1; i < x - 1; ++i) {
 			out_cimage.push(_cpoint('-', i, 0, 0)); 
 			out_cimage.push(_cpoint('-', i , 2, 0)); 
