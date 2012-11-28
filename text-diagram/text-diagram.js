@@ -306,7 +306,7 @@ var html_render = (function() {
 				var content = ast.attr.content;
 				var cnote = _cnote(content, 'left' == side);
 				if ('right' == side) {
-					_draw_cpoints(ccanvas, meta.lines[obj].x_offset + 2 - meta.min_x, ast.meta.y1, cnote);			
+					_draw_cpoints(ccanvas, meta.lines[obj].x_offset + 1 - meta.min_x, ast.meta.y1, cnote);			
 				}
 				else if ('left' == side) {
 					_draw_cpoints(ccanvas, meta.lines[obj].x_offset - 1 - _note_width(content) - meta.min_x, ast.meta.y1, cnote);			
