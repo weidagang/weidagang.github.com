@@ -355,14 +355,11 @@ var html_render = (function() {
         }
         
 		//up and bottom line
-		out_cimage.push(_cpoint('/', xoffset + 0, 0, 0));
-		out_cimage.push(_cpoint('-', xoffset + x - 1, 0, 0));
-		out_cimage.push(_cpoint('-', xoffset + 0, 2, 0));
-		out_cimage.push(_cpoint('-', xoffset + x - 1, 2, 0));
-		for (i = 1; i < x - 1; ++i) {
+		for (i = 0; i <= x - 1; ++i) {
 			out_cimage.push(_cpoint('-', xoffset + i, 0, 0)); 
 			out_cimage.push(_cpoint('-', xoffset + i , 2, 0)); 
 		}
+        out_cimage.push(_cpoint('\\', xoffset + x - 1, 0, 0));
 
 		//left and right line
 		out_cimage.push(_cpoint('|', xoffset + 0, 1, 0));
