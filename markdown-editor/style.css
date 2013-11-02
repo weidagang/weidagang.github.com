@@ -1,10 +1,10 @@
 textarea {
     font-family: Monaco, ProFont, monospace; 
-    font-size: 0.8em;
+    font-size: 1em;
 }
 
 #render-box {
-    font-size: 0.8em;
+    font-size: 1em;
 }
 
 #sidebar h1 {	
@@ -48,7 +48,7 @@ textarea {
 body {	
     background-color: #eee;
     font-family: "Lucida Grande", Verdana, sans-serif;
-    font-size: 0.8em;
+    font-size: 1em;
     line-height: 0.8em;
 }
 
