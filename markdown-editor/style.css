@@ -1,6 +1,6 @@
 textarea {
     font-family: Monaco, ProFont, monospace; 
-    font-size: 1em;
+    font-size: 13px;
 }
 
 #render-box {
@@ -63,7 +63,7 @@ body {
 
 .label {
     margin-bottom: 4px;
-    font-size: 0.8em;
+    font-size: 1em;
 }
 
 #container {	
