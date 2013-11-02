@@ -29,11 +29,12 @@ textarea {
 #sidebar code {	
     font-family: Monaco, ProFont, "Andale Mono", "Lucida Console", Courier, monospace;
     font-size: 12px;
+    line-height: 18px;
 }
 
 #sidebar pre {	
     line-height: 12px;
-    margin-top: 0;
+    margin-top: 10px;
     background-color: #f5f5f5;
     border: 1px solid #ccc;
     padding: 4px;
@@ -47,8 +48,8 @@ textarea {
 body {	
     background-color: #eee;
     font-family: "Lucida Grande", Verdana, sans-serif;
-    font-size: 1em;
-    line-height: 1em;
+    font-size: 0.8em;
+    line-height: 0.8em;
 }
 
 .renderbox {	

@@ -8,6 +8,7 @@ function compile(src) {
     for (var i in blocks) {
         if ('text' == blocks[i].type) {
             var text = convert_bold(blocks[i].text);
+            text = convert_italic(text);
             console.log('<p>' + text + '</p>');
             html.push('<p>' + text + '</p>');
         }
@@ -46,7 +47,7 @@ function lines2blocks(lines) {
                     buffer = [];
                     state = S_CODE;
                 }
-                else if ('>>>' == line) {
+                else if ('---' == line) {
                     buffer = [];
                     state = S_QUOTE;
                 }
@@ -96,24 +97,29 @@ function lines2blocks(lines) {
 }
 
 function convert_bold(line) {
-    var buffer = [];
-    var bold = false;
+    return convert_element(line, '**', 'strong');
+}
 
+function convert_italic(line) {
+    return convert_element(line, '__', 'i');
+}
+
+function convert_element(line, md_symbol, html_tag) {
     var startIdx = -1;
     var endIdx = -1;
     
-    startIdx = line.indexOf('**');
+    startIdx = line.indexOf(md_symbol);
     while (startIdx >= 0) {
-        endIdx = line.indexOf('**', startIdx + 2);
+        endIdx = line.indexOf(md_symbol, startIdx + 2);
 
         if (endIdx < 0) {
             break; 
         }
 
-        line = line.replace(/\*\*/, '<strong>'); 
-        line = line.replace(/\*\*/, '</strong>'); 
+        line = line.replace(md_symbol, '<' + html_tag + '>'); 
+        line = line.replace(md_symbol, '</' + html_tag + '>'); 
 
-        startIdx = line.indexOf('**');
+        startIdx = line.indexOf(md_symbol);
     }
     
     return line;
