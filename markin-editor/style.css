@@ -138,9 +138,8 @@ body {
 }
 
 textarea[name="markin"], textarea[name="xhtml"] {
-/* WinIE is fucking retarded. Thanks to Sam Ruby for the workaround:
-    http://www.intertwingly.net/blog/1432.html */ 	
     width: 98%;
+    resize: none;
 }	
 
 #ProjectSubmenu {

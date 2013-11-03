@@ -88,7 +88,7 @@ function blocks2html(blocks) {
         var text = blocks[i].text;
 
         if ('text' == type) {
-            html.push('<p>' + md2html(text) + '</p>');
+            html.push('<p>' + mi2html(text) + '</p>');
         }
         else if ('code' == type) {
             html.push('<pre><code>' + text + '</code></pre>');
@@ -104,7 +104,7 @@ function blocks2html(blocks) {
     return html.join('\n');
 }
 
-function md2html(line) {
+function mi2html(line) {
     line = convert_link(line);
     line = convert_bold(line);
     line = convert_emphasis(line);
@@ -139,22 +139,22 @@ function convert_emphasis(line) {
     return convert_element(line, '!!', 'mark');
 }
 
-function convert_element(line, md_symbol, html_tag) {
+function convert_element(line, mi_symbol, html_tag) {
     var startIdx = -1;
     var endIdx = -1;
     
-    startIdx = line.indexOf(md_symbol);
+    startIdx = line.indexOf(mi_symbol);
     while (startIdx >= 0) {
-        endIdx = line.indexOf(md_symbol, startIdx + 2);
+        endIdx = line.indexOf(mi_symbol, startIdx + 2);
 
         if (endIdx < 0) {
             break; 
         }
 
-        line = line.replace(md_symbol, '<' + html_tag + '>'); 
-        line = line.replace(md_symbol, '</' + html_tag + '>'); 
+        line = line.replace(mi_symbol, '<' + html_tag + '>'); 
+        line = line.replace(mi_symbol, '</' + html_tag + '>'); 
 
-        startIdx = line.indexOf(md_symbol);
+        startIdx = line.indexOf(mi_symbol);
     }
     
     return line;
