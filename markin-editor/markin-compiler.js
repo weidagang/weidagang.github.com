@@ -34,8 +34,8 @@ function lines2blocks(lines) {
                     buffer = [];
                     state = S_QUOTE;
                 }
-                else if (0 == line.indexOf('>>')) {
-                    blocks.push({ type : 'quote', text: line.substring(2).replace('^>>\s*', '') });
+                else if (0 == line.indexOf('>')) {
+                    blocks.push({ type : 'quote', text: line.substring(2).replace('^>\s*', '') });
                     state = S_TEXT;
                 }
                 else {
