@@ -129,9 +129,12 @@ body {
     margin-top: 10px;
     margin-bottom: 30px;
 }
+
 .actionbutton {
-    width: 7em;
-    margin-left:20px;
+    width: 100px;
+    height: 40px;
+    font-size: 18px;
+    border-radius: 5px;
 }
 
 textarea[name="markin"], textarea[name="xhtml"] {
