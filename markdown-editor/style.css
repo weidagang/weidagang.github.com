@@ -33,17 +33,9 @@ blockquote {
 }
 
 #sidebar h2 {	
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: -.5em;
-}
-
-#sidebar h3 {	
     font-size: 1em;
     font-weight: bold;
-    text-transform: none;
-    margin-bottom: .25em;
-    margin-top: 1.5em;
+    margin-bottom: .5em;
 }
 
 #sidebar code {	
@@ -61,6 +53,7 @@ blockquote {
 }
 
 #sidebar p {	
+    font-size: 14px;
     margin-top: 0;
     margin-bottom: 0;
 }

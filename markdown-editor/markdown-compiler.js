@@ -34,23 +34,21 @@ function lines2blocks(lines) {
                     buffer = [];
                     state = S_QUOTE;
                 }
-                else if ('#' == line.charAt(0)) {
-                    for (var j = 0; j < line.length; ++j) {
-                        if ('#' != line.charAt(j)) {
-                            break;
+                else {
+                    var h = title_level(line);
+
+                    if (h > 0) {
+                        if (h < line.length) {
+                            blocks.push({ type : 'title', text : line.replace(/^(\s*#+\s*)?/, "").replace(/\s*#+$/, ""), level : h});
+                        }
+                        else {
+                            blocks.push({ type : 'text', text: line});
                         }
                     }
-                    
-                    if (j < line.length) {
-                        blocks.push({ type : 'title', text : line.replace(/^#+\s*/, "").replace(/\s*#+$/, ""), level : j});
-                    }
                     else {
-                        blocks.push({ type : 'text', text: line});
-                    }
-                }
-                else {
-                    if ('' != line) {
-                        blocks.push({ type : 'text', text: line});
+                        if ('' != line) {
+                            blocks.push({ type : 'text', text: line});
+                        }
                     }
                 }
                 break;
@@ -146,6 +144,23 @@ function convert_element(line, md_symbol, html_tag) {
     }
     
     return line;
+}
+
+function title_level(line) {
+    var i;
+    var found = false;
+
+    for (i = 0; i < line.length; ++i) {
+        if ('#' == line[i]) {
+            found = true;
+            break;
+        }
+        else if (' ' != line[i]) {
+            break;
+        }
+    }
+    
+    return found ? i + 1 : 0;
 }
 
 /*
