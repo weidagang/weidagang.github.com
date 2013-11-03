@@ -30,9 +30,13 @@ function lines2blocks(lines) {
                     buffer = [];
                     state = S_CODE;
                 }
-                else if ('---' == line) {
+                else if ('>>>' == line) {
                     buffer = [];
                     state = S_QUOTE;
+                }
+                else if (0 == line.indexOf('>>')) {
+                    blocks.push({ type : 'quote', text: line.substring(2).replace('^>>\s*', '') });
+                    state = S_TEXT;
                 }
                 else {
                     var h = title_level(line);
@@ -62,8 +66,8 @@ function lines2blocks(lines) {
                 }
                 break;
             case S_QUOTE:
-                if ('---' == line) {
-                    blocks.push({ type : 'quote', text: buffer.join('\n') });
+                if ('>>>' == line) {
+                    blocks.push({ type : 'quote', text: buffer.join('<br>') });
                     state = S_TEXT;
                 }
                 else {
