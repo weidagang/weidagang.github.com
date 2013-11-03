@@ -1,31 +1,14 @@
 function compile(src) {
+    // split the markdown source into lines
     var lines = src.split('\n');
-
-    var blocks = lines2blocks(lines);
-    //console.log(blocks);
     
-    var html = [];
-    for (var i in blocks) {
-        if ('text' == blocks[i].type) {
-            var text = convert_bold(blocks[i].text);
-            text = convert_italic(text);
-            console.log('<p>' + text + '</p>');
-            html.push('<p>' + text + '</p>');
-        }
-        else if ('code' == blocks[i].type) {
-            console.log('<pre><code>' + blocks[i].text + '</code></pre>');
-            html.push('<pre><code>' + blocks[i].text + '</code></pre>');
-        }
-        else if ('quote' == blocks[i].type) {
-            console.log('<blockquote>' + blocks[i].text + '</blockquote>');
-            html.push('<blockquote>' + blocks[i].text + '</blockquote>');
-        }
-        else if ('title' == blocks[i].type) {
-            console.log('<h' + blocks[i].level + '>' + blocks[i].text + '</h' + blocks[i].level + '>');
-            html.push('<h' + blocks[i].level + '>' + blocks[i].text + '</h' + blocks[i].level + '>');
-        }
-    }
-    return html.join('\n');
+    // organize lines into blocks
+    var blocks = lines2blocks(lines);
+    
+    // convert blocks into html
+    var html = blocks2html(blocks); 
+
+    return html;
 }
 
 function lines2blocks(lines) {
@@ -96,12 +79,47 @@ function lines2blocks(lines) {
     return blocks;
 }
 
+function blocks2html(blocks) {
+    var html = [];
+    for (var i in blocks) {
+        var type = blocks[i].type;
+        var text = blocks[i].text;
+
+        if ('text' == type) {
+            html.push('<p>' + md2html(text) + '</p>');
+        }
+        else if ('code' == type) {
+            html.push('<pre><code>' + text + '</code></pre>');
+        }
+        else if ('quote' == type) {
+            html.push('<blockquote>' + text + '</blockquote>');
+        }
+        else if ('title' == type) {
+            var level = blocks[i].level;
+            html.push('<h' + level + '>' + text + '</h' + level + '>');
+        }
+    }
+    return html.join('\n');
+}
+
+function md2html(line) {
+    line = convert_link(line);
+    line = convert_bold(line);
+    line = convert_italic(line);
+    return line;
+    
+}
+
 function convert_bold(line) {
     return convert_element(line, '**', 'strong');
 }
 
 function convert_italic(line) {
     return convert_element(line, '__', 'i');
+}
+
+function convert_link(line) {
+    return line.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
 }
 
 function convert_element(line, md_symbol, html_tag) {
