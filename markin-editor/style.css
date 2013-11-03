@@ -1,13 +1,13 @@
 textarea {
     font-family: Monaco, ProFont, monospace; 
-    font-size: 13px;
+    font-size: 14px;
 }
 
 #render-box {
     visibility: hidden; 
     background: white;
     font-family: Georgia, serif;
-    font-size: 1em;
+    font-size: 14px;
     border: 1px #888 solid;
     border-radius: 5px;
     padding: 0 5px;
@@ -43,13 +43,13 @@ blockquote {
     padding-right: 10px;
 }
 
-#sidebar h1 {	
-    font-size: 1.5em;
+h1 {
+    font-size: 20px;
     font-weight: bold;
 }
 
-#sidebar h2 {	
-    font-size: 1em;
+h2 {	
+    font-size: 18px;
     font-weight: bold;
     margin-bottom: .5em;
 }
@@ -77,13 +77,13 @@ blockquote {
 body {	
     background-color: #ffffff;
     font-family: "Lucida Grande", Verdana, sans-serif;
-    font-size: 0.8em;
-    line-height: 1.5em;
+    font-size: 14px;
+    line-height: 22px;
 }
 
 .label {
     margin-bottom: 4px;
-    font-size: 1em;
+    font-size: 14px;
 }
 
 #container {	
