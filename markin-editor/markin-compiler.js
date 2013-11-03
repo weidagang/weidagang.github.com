@@ -35,7 +35,7 @@ function lines2blocks(lines) {
                     state = S_QUOTE;
                 }
                 else if (0 == line.indexOf('>')) {
-                    blocks.push({ type : 'quote', text: line.substring(2).replace('^>\s*', '') });
+                    blocks.push({ type : 'quote', text: line.substring(1).replace('^>\s*', '') });
                     state = S_TEXT;
                 }
                 else {
