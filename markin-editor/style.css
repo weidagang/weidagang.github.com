@@ -107,14 +107,14 @@ body {
 
 #app {	
     padding: 0 10px 0 10px;
-    margin-right: 270px;
+    margin-right: 300px;
     background-color: transparent;
     border-right: 0px solid #bbb;
 }
 
 #sidebar {
     float: right;
-    width: 250px;
+    width: 280px;
     margin: 0;
     margin-right: 10px;
     padding: 0;
