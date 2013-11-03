@@ -4,8 +4,14 @@ textarea {
 }
 
 #render-box {
-    font-size: 1em;
     visibility: hidden; 
+    background: white;
+    font-family: Georgia, serif;
+    font-size: 1em;
+    border: 1px #888 solid;
+    border-radius: 5px;
+    padding: 0 5px;
+    width: 97%;
 }
 
 #render-box code {
@@ -14,6 +20,14 @@ textarea {
 
 #preview-box {
     visibility: hidden; 
+    margin-top: 30px;
+    border-radius: 5px;
+}
+
+#preview-box textarea {
+    border-radius: 5px;
+    border-color: #888;
+    padding-left: 5px;
 }
 
 blockquote {
@@ -63,15 +77,6 @@ body {
     font-family: "Lucida Grande", Verdana, sans-serif;
     font-size: 1em;
     line-height: 0.8em;
-}
-
-.renderbox {	
-    background: white;
-    font-family: Georgia, serif;
-    font-size: 1em;
-    border: 1px #888 solid;
-    padding: 0 5px;
-    width: 97%;
 }
 
 .label {
