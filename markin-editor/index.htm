@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"> 
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>Markin Editor</title>
+    <script src='markin-compiler.js'></script>
+    <script>
+        function convert() {
+            var mdSrc = document.getElementById('md-src');
+            var renderBox = document.getElementById('render-box');
+            var htmlSrc = document.getElementById('html-src');
+            var previewBox = document.getElementById('preview-box');
+
+            var html = compile(mdSrc.value);
+
+            htmlSrc.innerText = html;
+            previewBox.style.visibility = 'visible';
+            
+            renderBox.innerHTML = html;
+            renderBox.style.visibility = 'visible';
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div id="sidebar">
+            <h2>Syntax Reference</h2>
+            <h3></h3>
+
+            <p>Title</p>
+            <pre><code># Title 1 #
+ # Title 2 #
+  # Title 3 #</code></pre>
+
+            <p>Emphasis</p>
+            <pre><code>**bold**
+~~italic~~
+__underline__
+!!highlight!!
+</code></pre>
+
+            <p>Code</p>
+            <pre><code>```
+int main() {
+    printf("hello world\n");
+}
+```
+
+The ``printf()`` is for stdout.
+</code></pre>
+
+            <p>Quote</p>
+            <pre><code>---
+A closed door is not always locked,
+so give it a push at least.
+---
+</code></pre>
+
+            <p>Link</p>
+            <pre><code>[example](http://url.com/)<code></pre>
+        </div> <!-- sidebar -->
+
+        <div id="app">
+            <div>
+                <p class="label">Markin Source:</p>
+                <textarea id='md-src' rows="25" cols="80" name="markin"># Title 1 #
+
+ # Title 2 #
+
+  # Title 3 #
+
+Roses are **red**, Violets are __blue__, Tulips are ~~yellow~~. I love !!Tulips!!.
+
+**Code:**
+```
+int main() {
+    printf("hello world\n");
+    return 0;
+}
+```
+
+The ``printf()`` is for stdout.
+
+**Quote:**
+---
+A closed door is not always locked, 
+so give it a push at least.
+---
+
+**Link:**
+[Markin Editor](http://weidagang.github.io/markin-editor/)
+
+</textarea>
+                <div id="buttonrow">
+                    <input type="submit" name="convert" value="Convert" class="actionbutton" onclick='javascript:convert()'>
+                </div> <!--buttonrow-->
+
+            </div>
+            
+            <div id='render-box'></div>
+
+            <div id = 'preview-box'>
+                <textarea id='html-src' name="xhtml" rows="25" cols="80" readonly="readonly"></textarea>
+            </div>
+
+        </div> <!-- app -->
+    </div> <!-- container -->
+
+</body>
+</html>
