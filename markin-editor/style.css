@@ -31,12 +31,14 @@ textarea {
 }
 
 blockquote {
-    border-width : 2px;
+    border-top-width : 0px;
+    border-bottom-width : 0px;
+    border-right-width : 0px;
+    border-left-width : 4px;
     border-style : solid;
-    border-color : #eee;
-    border-radius : 5px;
-    padding-top : 15px;
-    padding-bottom: 15px;
+    border-color : #DDD;
+    padding-top : 5px;
+    padding-bottom: 5px;
     padding-left: 10px;
     padding-right: 10px;
 }
