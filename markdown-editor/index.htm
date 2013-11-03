@@ -7,13 +7,17 @@
     <script>
         function convert() {
             var mdSrc = document.getElementById('md-src');
-            var htmlSrc = document.getElementById('html-src');
             var renderBox = document.getElementById('render-box');
+            var htmlSrc = document.getElementById('html-src');
+            var previewBox = document.getElementById('preview-box');
 
             var html = compile(mdSrc.value);
 
             htmlSrc.innerText = html;
+            previewBox.style.visibility = 'visible';
+            
             renderBox.innerHTML = html;
+            renderBox.style.visibility = 'visible';
         }
     </script>
 </head>
@@ -37,7 +41,10 @@ __italic__</code></pre>
 int main() {
     printf("hello world\n");
 }
-```</code></pre>
+```
+
+The ``printf()`` is for stdout.
+</code></pre>
 
             <p>Quote</p>
             <pre><code>---
@@ -61,7 +68,7 @@ so give it a push at least.
 
 Roses are **red**, Violets are __blue__.
 
-Code: 
+**Code:**
 ```
 int main() {
     printf("hello world\n");
@@ -69,13 +76,15 @@ int main() {
 }
 ```
 
-Quote: 
+The ``printf()`` is for stdout.
+
+**Quote:**
 ---
 A closed door is not always locked, 
 so give it a push at least.
 ---
 
-Link:
+**Link:**
 [Markdown Editor](http://weidagang.github.io/markdown-editor/)
 
 </textarea>
@@ -84,13 +93,13 @@ Link:
                 </div> <!--buttonrow-->
 
             </div>
-
-            <p class="label">HTML Source:</p>
-            <div>
-                <textarea id='html-src' name="xhtml" rows="25" cols="80" readonly="readonly"></textarea>
-            </div><p class="label">HTML Preview:</p>
-
+            
+            <hr/>
             <div id='render-box' class="render-div"></div>
+
+            <div id = 'preview-box'>
+                <textarea id='html-src' name="xhtml" rows="25" cols="80" readonly="readonly"></textarea>
+            </div>
 
         </div> <!-- app -->
     </div> <!-- container -->

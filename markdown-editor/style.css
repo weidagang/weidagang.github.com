@@ -5,6 +5,26 @@ textarea {
 
 #render-box {
     font-size: 1em;
+    visibility: hidden; 
+}
+
+#render-box code {
+    color: #800040;
+}
+
+#preview-box {
+    visibility: hidden; 
+}
+
+blockquote {
+    border-width : 2px;
+    border-style : solid;
+    border-color : #eee;
+    border-radius : 5px;
+    padding-top : 15px;
+    padding-bottom: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 #sidebar h1 {	
@@ -46,7 +66,7 @@ textarea {
 }
 
 body {	
-    background-color: #eee;
+    background-color: #ffffff;
     font-family: "Lucida Grande", Verdana, sans-serif;
     font-size: 1em;
     line-height: 0.8em;
@@ -107,7 +127,7 @@ body {
 
 #buttonrow {	
     margin-top: 10px;
-    margin-bottom: 60px;
+    margin-bottom: 30px;
 }
 .actionbutton {
     width: 7em;

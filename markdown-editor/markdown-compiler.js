@@ -106,8 +106,13 @@ function md2html(line) {
     line = convert_link(line);
     line = convert_bold(line);
     line = convert_italic(line);
+    line = convert_code(line);
     return line;
     
+}
+
+function convert_link(line) {
+    return line.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
 }
 
 function convert_bold(line) {
@@ -118,8 +123,8 @@ function convert_italic(line) {
     return convert_element(line, '__', 'i');
 }
 
-function convert_link(line) {
-    return line.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
+function convert_code(line) {
+    return convert_element(line, '``', 'code');
 }
 
 function convert_element(line, md_symbol, html_tag) {
