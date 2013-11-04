@@ -185,7 +185,7 @@ function parse_table(lines) {
         buffer.push('<tr>');
         var heads = result_header[1].split(',');
         for (var i = 0; i < heads.length; ++i) {
-            buffer.push('<th>' + heads[i] + '</th>');
+            buffer.push('<th>' + heads[i].replace(/^\s+|\s+$/, '') + '</th>');
         }
         buffer.push('</tr>\n');
         offset = 1;
@@ -198,7 +198,7 @@ function parse_table(lines) {
             buffer.push('<tr>');
             var tds = result_td[1].split(',');
             for (var i = 0; i < tds.length; ++i) {
-                buffer.push('<td>' + tds[i] + '</td>');
+                buffer.push('<td>' + tds[i].replace(/^\s+|\s+$/, '') + '</td>');
             }
             buffer.push('</tr>\n');
         }
