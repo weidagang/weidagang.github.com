@@ -15,10 +15,14 @@ function lines2blocks(lines) {
     var S_TEXT = '0';
     var S_CODE = '1';
     var S_QUOTE = '2';
+    var S_TABLE = '3';
 
     var state = S_TEXT;
     var buffer = [];
     var blocks = [];
+    
+    var EOF = '!@#$%^&*()';
+    lines.push(EOF);
 
     for (var i = 0; i < lines.length; ++i) {
         var line = lines[i];
@@ -26,7 +30,10 @@ function lines2blocks(lines) {
         
         switch(state) {
             case S_TEXT:
-                if ('```' == line) {
+                if (EOF == line) {
+                    break;
+                }
+                else if ('```' == line) {
                     buffer = [];
                     state = S_CODE;
                 }
@@ -57,7 +64,11 @@ function lines2blocks(lines) {
                 }
                 break;
             case S_CODE:
-                if ('```' == line) {
+                if (EOF == line) {
+                    blocks.push({ type : 'text', text: '```' + '<br>' +  buffer.join('<br>') });
+                    break;
+                }
+                else if ('```' == line) {
                     blocks.push({ type : 'code', text: buffer.join('\n') });
                     state = S_TEXT;
                 }
@@ -66,13 +77,18 @@ function lines2blocks(lines) {
                 }
                 break;
             case S_QUOTE:
-                if ('>>>' == line) {
+                if (EOF == line) {
+                    blocks.push({ type : 'text', text: '>>>' + '<br>' +  buffer.join('<br>') });
+                    break;
+                }
+                else if ('>>>' == line) {
                     blocks.push({ type : 'quote', text: buffer.join('<br>') });
                     state = S_TEXT;
                 }
                 else {
                     buffer.push(line);
                 }
+                break;
             default:
                 break;
         }

@@ -5,6 +5,11 @@ textarea {
     border-radius: 5px;
 }
 
+table {
+    border-style: solid;
+    border-width: 2px;
+}
+
 #render-box {
     visibility: hidden; 
     background: white;
