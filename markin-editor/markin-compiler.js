@@ -1,3 +1,15 @@
+/*
+ * markin-compiler.js v0.1.0
+ * http://weidagang.github.io/markin-editor
+ *
+ * Copyright 2011, Todd Wei
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * 
+ * Contact: weidagang@gmail.com
+ *
+ * Date: 2013-11-04
+ */
+
 function compile(src) {
     // split the markdown source into lines
     var lines = src.split('\n');
