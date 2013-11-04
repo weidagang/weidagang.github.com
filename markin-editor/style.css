@@ -1,12 +1,14 @@
 textarea {
-    font-family: Monaco, ProFont, monospace; 
+    font-family: Quicksand, Monaco, ProFont, monospace; 
     font-size: 14px;
+    border-color: #888;
+    border-radius: 5px;
 }
 
 #render-box {
     visibility: hidden; 
     background: white;
-    font-family: Georgia, serif;
+    font-family: Quicksand, Georgia, serif;
     font-size: 14px;
     border: 1px #888 solid;
     border-radius: 5px;
@@ -55,7 +57,7 @@ h2 {
 }
 
 #sidebar code {	
-    font-family: Monaco, ProFont, "Andale Mono", "Lucida Console", Courier, monospace;
+    font-family: Quicksand, Monaco, ProFont, "Andale Mono", "Lucida Console", Courier, monospace;
     font-size: 12px;
     line-height: 18px;
 }
@@ -76,7 +78,7 @@ h2 {
 
 body {	
     background-color: #ffffff;
-    font-family: "Lucida Grande", Verdana, sans-serif;
+    font-family: Quicksand, "Lucida Grande", Verdana, sans-serif;
     font-size: 14px;
     line-height: 22px;
 }
