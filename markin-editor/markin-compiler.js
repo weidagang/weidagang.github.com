@@ -34,14 +34,27 @@ function lines2blocks(lines) {
                     break;
                 }
                 else if ('```' == line) {
-                    buffer = [];
+                    if (buffer.length > 0) {
+                        blocks.push({ type : 'text', text: buffer.join('<br>') });
+                        buffer = [];
+                    }
+
                     state = S_CODE;
                 }
                 else if ('>>>' == line) {
-                    buffer = [];
+                    if (buffer.length > 0) {
+                        blocks.push({ type : 'text', text: buffer.join('<br>') });
+                        buffer = [];
+                    }
+
                     state = S_QUOTE;
                 }
                 else if (0 == line.indexOf('>')) {
+                    if (buffer.length > 0) {
+                        blocks.push({ type : 'text', text: buffer.join('<br>') });
+                        buffer = [];
+                    }
+
                     blocks.push({ type : 'quote', text: line.substring(1).replace('^>\s*', '') });
                     state = S_TEXT;
                 }
@@ -58,7 +71,13 @@ function lines2blocks(lines) {
                     }
                     else {
                         if ('' != line) {
-                            blocks.push({ type : 'text', text: line});
+                            buffer.push(line);
+                        }
+                        else {
+                            if (buffer.length > 0) {
+                                blocks.push({ type : 'text', text: buffer.join('<br>') });
+                                buffer = [];
+                            }
                         }
                     }
                 }
@@ -70,6 +89,7 @@ function lines2blocks(lines) {
                 }
                 else if ('```' == line) {
                     blocks.push({ type : 'code', text: buffer.join('\n') });
+                    buffer = [];
                     state = S_TEXT;
                 }
                 else {
@@ -83,6 +103,7 @@ function lines2blocks(lines) {
                 }
                 else if ('>>>' == line) {
                     blocks.push({ type : 'quote', text: buffer.join('<br>') });
+                    buffer = [];
                     state = S_TEXT;
                 }
                 else {
