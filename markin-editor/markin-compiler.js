@@ -31,6 +31,11 @@ function lines2blocks(lines) {
         switch(state) {
             case S_TEXT:
                 if (EOF == line) {
+                    if (buffer.length > 0) {
+                        blocks.push({ type : 'text', text: buffer.join('<br>') });
+                        buffer = [];
+                    }
+
                     break;
                 }
                 else if ('```' == line) {
@@ -48,6 +53,14 @@ function lines2blocks(lines) {
                     }
 
                     state = S_QUOTE;
+                }
+                else if ('[' == line) {
+                    if (buffer.length > 0) {
+                        blocks.push({ type : 'text', text: buffer.join('<br>') });
+                        buffer = [];
+                    }
+
+                    state = S_TABLE;
                 }
                 else if (0 == line.indexOf('>')) {
                     if (buffer.length > 0) {
@@ -110,6 +123,19 @@ function lines2blocks(lines) {
                     buffer.push(line);
                 }
                 break;
+            case S_TABLE:
+                if (EOF == line) {
+                    blocks.push({ type : 'text', text: '[' + '<br>' +  buffer.join('<br>') });
+                    break;
+                }
+                else if (']' == line) {
+                    blocks.push({ type : 'table', lines : buffer });
+                    buffer = [];
+                    state = S_TEXT;
+                }
+                else {
+                    buffer.push(line);
+                }
             default:
                 break;
         }
@@ -133,12 +159,54 @@ function blocks2html(blocks) {
         else if ('quote' == type) {
             html.push('<blockquote>' + text + '</blockquote>');
         }
+        else if ('table' == type) {
+            html.push(parse_table(blocks[i].lines));
+        }
         else if ('title' == type) {
             var level = blocks[i].level;
             html.push('<h' + level + '>' + text + '</h' + level + '>');
         }
     }
     return html.join('\n');
+}
+
+function parse_table(lines) {
+    if (null == lines || 0 == lines.length) {
+        return '<p>[<br>]</p>';
+    }
+    
+    var buffer = [];
+    buffer.push('<table>\n');
+    
+    var offset = 0;
+    var regex_header = /^\s*\*\[(.+)\]\*\s*$/
+    var result_header = lines[0].match(regex_header);
+    if (null != result_header) {
+        buffer.push('<tr>');
+        var heads = result_header[1].split(',');
+        for (var i = 0; i < heads.length; ++i) {
+            buffer.push('<th>' + heads[i] + '</th>');
+        }
+        buffer.push('</tr>\n');
+        offset = 1;
+    }
+
+    var regex_td = /^\s*\[(.+)\]\s*$/
+    for (var idx = offset; idx < lines.length; ++idx) {
+        var result_td = lines[idx].match(regex_td);
+        if (null != result_td) {
+            buffer.push('<tr>');
+            var tds = result_td[1].split(',');
+            for (var i = 0; i < tds.length; ++i) {
+                buffer.push('<td>' + tds[i] + '</td>');
+            }
+            buffer.push('</tr>\n');
+        }
+    }
+
+    buffer.push('</table>');
+
+    return buffer.join('');
 }
 
 function mi2html(line) {
