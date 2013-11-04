@@ -221,7 +221,7 @@ function mi2html(line) {
 }
 
 function convert_link(line) {
-    return line.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
+    return line.replace(/\[([^\]]+?)\]\(([^\)]+?)\)/g, '<a href="$2">$1</a>');
 }
 
 function convert_bold(line) {
