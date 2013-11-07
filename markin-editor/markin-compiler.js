@@ -156,6 +156,10 @@ function lines2blocks(lines) {
     return blocks;
 }
 
+function html_escape(text) {
+    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function blocks2html(blocks) {
     var html = [];
     for (var i in blocks) {
@@ -166,17 +170,17 @@ function blocks2html(blocks) {
             html.push('<p>' + mi2html(text) + '</p>');
         }
         else if ('code' == type) {
-            html.push('<pre><code>' + text + '</code></pre>');
+            html.push('<pre><code>' + html_escape(text) + '</code></pre>');
         }
         else if ('quote' == type) {
-            html.push('<blockquote>' + text + '</blockquote>');
+            html.push('<blockquote>' + html_escape(text) + '</blockquote>');
         }
         else if ('table' == type) {
             html.push(parse_table(blocks[i].lines));
         }
         else if ('title' == type) {
             var level = blocks[i].level;
-            html.push('<h' + level + '>' + text + '</h' + level + '>');
+            html.push('<h' + level + '>' + html_escape(text) + '</h' + level + '>');
         }
     }
     return html.join('\n');
