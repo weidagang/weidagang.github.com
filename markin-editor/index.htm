@@ -3,7 +3,7 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"> 
     <link rel="stylesheet" type="text/css" href="style.css" />
     <title>Markin Editor</title>
-    <script src='markin-compiler.js'></script>
+    <script src='markin-compiler.0.2.0.js'></script>
     <script>
         function convert() {
             var miSrc = document.getElementById('mi-src');
@@ -12,12 +12,14 @@
             var previewBox = document.getElementById('preview-box');
 
             var html = compile(miSrc.value);
-
+            
+            /*
             htmlSrc.value = html;
             previewBox.style.visibility = 'visible';
             
             renderBox.innerHTML = html;
             renderBox.style.visibility = 'visible';
+            */
         }
     </script>
 </head>
