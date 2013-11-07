@@ -242,7 +242,7 @@ var block_parser = (function() {
     }
 
     function CONCAT() {
-        var _args = this.arguments;
+        var _args = arguments;
 
         return function(lines, idx) {
             var _idx = idx;
@@ -253,6 +253,7 @@ var block_parser = (function() {
                 }
                 _idx += n;
             }
+            console.log('CONCAT(), idx=' + idx + ', rc=' + (_idx - idx));
             return _idx - idx;
         }
     }
@@ -280,10 +281,9 @@ var block_parser = (function() {
                     _idx += n;
                 }
             }
-            return (idx < lines.length && lines[idx].type == line_type) ? 1 : 0;
+            return _idx - idx;
         }
     }
-
 
     var _meta = [
         [ 'title_1', IS(Line.title_1) ],
@@ -310,7 +310,7 @@ var block_parser = (function() {
         ],
         [ 'code', CONCAT(
                                 IS(Line.code_begin), 
-                                NOT(Line.code_end), 
+                                REPEAT(NOT(Line.code_end), 0), 
                                 IS(Line.code_end)
                         ) 
         ],
@@ -329,14 +329,228 @@ var block_parser = (function() {
                     ) 
         ],
         [ 'empty', REPEAT(IS(Line.empty), 1) ],
-        [ 'text', REPEAT(NOT(Line.empty), 1) ]
+        [ 'text', REPEAT(IS(Line.text), 1) ]
     ];
+
+    function _parse(lines) {
+        var blocks = [];
+
+        var idx = 0;
+        while (idx < lines.length) {
+            var matched = false;
+
+            for (var i = 0; i < _meta.length; ++i) {
+                var meta_block = _meta[i];
+                var type = meta_block[0];
+                var rule = meta_block[1];
+                var n = rule(lines, idx);
+                if (n > 0) {
+                    console.log('block=' + type + ', from=' + idx + ', to=' + (idx + n));
+                    matched = true;
+                    blocks.push({ type : type, lines : lines.slice(idx, idx + n) });
+                    idx += n;
+                }
+            }
+
+            if (!matched) {
+                //console.log('NO MATCH: ' + lines[idx].type + ', ' + lines[idx].text);
+                break;
+            }
+        }
+
+        return blocks;
+    }
+
+    return { parse : _parse };
+})();
+
+var html_generator = (function(){
+    function _convert_text_line(line) {
+        function convert_link(line) {
+            return line.replace(/\[([^\]]+?)\]\(([^\)]+?)\)/g, '<a href="$2">$1</a>');
+        }
+
+        function convert_bold(line) {
+            return convert_element(line, '**', 'strong');
+        }
+
+        function convert_italic(line) {
+            return convert_element(line, '~~', 'i');
+        }
+
+        function convert_underline(line) {
+            return convert_element(line, '__', 'u');
+        }
+
+        function convert_code(line) {
+            return convert_element(line, '``', 'code');
+        }
+
+        function convert_emphasis(line) {
+            return convert_element(line, '!!', 'mark');
+        }
+
+        function convert_element(line, mi_symbol, html_tag) {
+            var startIdx = -1;
+            var endIdx = -1;
+            
+            startIdx = line.indexOf(mi_symbol);
+            while (startIdx >= 0) {
+                endIdx = line.indexOf(mi_symbol, startIdx + 2);
+
+                if (endIdx < 0) {
+                    break; 
+                }
+
+                line = line.replace(mi_symbol, '<' + html_tag + '>'); 
+                line = line.replace(mi_symbol, '</' + html_tag + '>'); 
+
+                startIdx = line.indexOf(mi_symbol);
+            }
+            
+            return line;
+        }
+
+        line = convert_link(line);
+        line = convert_bold(line);
+        line = convert_emphasis(line);
+        line = convert_italic(line);
+        line = convert_underline(line);
+        line = convert_code(line);
+
+        return line;
+    }
+
+    function _convert_text_block(block) {
+        var html = []; 
+        html.push('<p>');
+        for (var i = 0; i < block.lines.length; ++i) {
+            html.push(_convert_text_line(block.lines[i].text));
+            html.push('<br>');
+        }
+        html.push('</p>');
+        return html.join('');
+    }
+
+    function _convert_code_block(block) {
+        var html = []; 
+        html.push('<pre>');
+        html.push('<code>');
+        for (var i = 1; i < block.lines.length - 1; ++i) {
+            html.push(block.lines[i].text + '\n');
+        }
+        html.push('</code>');
+        html.push('</pre>');
+        return html.join('');
+    }
+
+    function _convert_enclosed_quote_block(block) {
+        var html = []; 
+        html.push('<blockquote>');
+        for (var i = 1; i < block.lines.length - 1; ++i) {
+            html.push(block.lines[i].text);
+            html.push('<br>');
+        }
+        html.push('</blockquote>');
+        return html.join('');
+    }
+
+    function _convert_prefixed_quote_block(block) {
+        var html = []; 
+        html.push('<blockquote>');
+        for (var i = 0; i < block.lines.length; ++i) {
+            html.push(block.lines[i].text.substring(2));
+            html.push('<br>');
+        }
+        html.push('</blockquote>');
+        return html.join('');
+    }
+
+    function _convert_table_block(block) {
+        var buffer = [];
+        var lines = block.lines;
+
+        buffer.push('<table>\n');
+        
+        if (lines.length > 2) {
+            var offset = 1;
+
+            var regex_header = /^\s*\*\[(.+)\]\*\s*$/
+            var result_header = lines[1].text.match(regex_header);
+            if (null != result_header) {
+                buffer.push('<tr>');
+                var heads = result_header[1].split(',');
+                for (var i = 0; i < heads.length; ++i) {
+                    buffer.push('<th>' + heads[i].replace(/^\s+|\s+$/, '') + '</th>');
+                }
+                buffer.push('</tr>\n');
+                offset = 2;
+            }
+
+            var regex_td = /^\s*\[(.+)\]\s*$/
+            for (var idx = offset; idx < lines.length - 1; ++idx) {
+                var result_td = lines[idx].text.match(regex_td);
+                if (null != result_td) {
+                    buffer.push('<tr>');
+                    var tds = result_td[1].split(',');
+                    for (var i = 0; i < tds.length; ++i) {
+                        buffer.push('<td>' + tds[i].replace(/^\s+|\s+$/, '') + '</td>');
+                    }
+                    buffer.push('</tr>\n');
+                }
+            }
+        }
+
+        buffer.push('</table>');
+
+        return buffer.join('');
+    }
+
+    function _generate(blocks) {
+        var html = [];
+        for (var i = 0; i < blocks.length; ++i) {
+            if ('text' == blocks[i].type) {
+                var h = _convert_text_block(blocks[i]);
+                html.push(h);
+            }
+            else if ('code' == blocks[i].type) {
+                var h = _convert_code_block(blocks[i]);
+                html.push(h);
+            }
+            else if ('enclosed_quote' == blocks[i].type) {
+                var h = _convert_enclosed_quote_block(blocks[i]);
+                html.push(h);
+            }
+            else if ('prefixed_quote' == blocks[i].type) {
+                var h = _convert_prefixed_quote_block(blocks[i]);
+                html.push(h);
+            }
+            else if ('table' == blocks[i].type) {
+                var h = _convert_table_block(blocks[i]);
+                html.push(h);
+            }
+        }
+        return html.join('');
+    }
+
+    return { generate : _generate };
 })();
 
 function compile(src) {
-    var tokens = line_scanner.parse(src);
-    for (var i = 0; i < tokens.length; ++i) {
-        console.log(tokens[i]);
+    var lines = line_scanner.parse(src);
+    for (var i = 0; i < lines.length; ++i) {
+        console.log(lines[i]);
     }
+
+    console.log('---------------------');
+
+    var blocks = block_parser.parse(lines);
+    for (var i = 0; i < blocks.length; ++i) {
+        console.log(blocks[i]);
+    }
+
+    var html = html_generator.generate(blocks);
+    console.log(html);
+    return html;
 }
 
