@@ -169,60 +169,6 @@ var line_scanner = (function() {
 })();
 
 var block_parser = (function() {
-    function _is_type(line, type) {
-        return null != line && type == line.type;
-    }
-
-    function _is_not_type(line, type) {
-        return null != line && type != line.type;
-    }
-
-    function empty_line(lines, idx) {
-        return _is_type(lines[idx], Line.empty) ? 1 : -1;
-    }
-
-    function text_line(lines, idx) {
-        return _is_not_type(lines[idx], Line.empty) ? 1 : -1;
-    }
-
-    function title_line(level) {
-        return function(lines, idx) {
-            return _is_type(lines[idx], 'title_' + level) ? 1 : -1;
-        }
-    }
-
-    function equal_line(lines, idx) {
-        return _is_type(lines[idx], Line.line_equal) ? 1 : -1;
-    }
-
-    function minus_line(line, idx) {
-        return _is_type(lines[idx], Line.line_minus) ? 1 : -1;
-    }
-
-    function dot_line(line, idx) {
-        return _is_type(lines[idx], Line.line_dot) ? 1 : -1;
-    }
-
-    function code_begin_line(line, idx) {
-        return _is_type(lines[idx], Line.code_begin) ? 1 : -1;
-    }
-
-    function code_end_line(line, idx) {
-        return _is_type(lines[idx], Line.code_end) ? 1 : -1;
-    }
-
-    function quote_prefixeded_line(line, idx) {
-        return _is_type(lines[idx], Line.quote_prefixed) ? 1 : -1;
-    }
-
-    function quote_begin_line(line, idx) {
-        return _is_type(lines[idx], Line.quote_begin) ? 1 : -1;
-    }
-
-    function quote_end_line(line, idx) {
-        return _is_type(lines[idx], Line.quote_end) ? 1 : -1;
-    }
-
     function IS(line_type) {
         return function(lines, idx) {
             return (idx < lines.length && lines[idx].type == line_type) ? 1 : -1;
