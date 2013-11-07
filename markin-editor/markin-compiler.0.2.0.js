@@ -21,7 +21,7 @@ var Line = {
     line_equal : 'LineEqual',
     line_minus : 'LineMinus',
     line_dot : 'LineDot',
-    quote_single : 'QuoteSingle',
+    quote_prefixed : 'QuotePrefixed',
     code_multi : 'CodeMulti',
     code_begin: 'CodeBegin',
     code_end: 'CodeEnd',
@@ -53,7 +53,7 @@ var line_scanner = (function() {
         [ Line.line_equal, _repeats('=', 3) ],
         [ Line.line_minus, _repeats('-', 3) ],
         [ Line.line_dot, _repeats('.', 3) ],
-        [ Line.quote_single, _starts_with('> ') ],
+        [ Line.quote_prefixed, _starts_with('> ') ],
         [ Line.code_multi, _starts_with('```') ],
         [ Line.quote_multi, _starts_with('>>>')],
         [ Line.table_begin, _equals('[')],
@@ -168,22 +168,170 @@ var line_scanner = (function() {
     };
 })();
 
-/*
-var syntax = (function() {
-    
-    var meta_syntax = {
-        rules : [
-            [ 'title_1', title(1) ],
-            [ 'title_2', title(2) ],
-            [ 'title_3', title(3) ],
-            [ 'title_4', title(4) ],
-            [ 'quote_block_single', REPEAT(quote_single, 1) ],
-            [ 'code_block', CONCAT(code_begin, (NOT(code_end)), code_end) ],
-            [ 'quote_block_multi', CONCAT(quote_begin, (NOT(quote_end)), quote_end) ],
-        ]
-    };
+var block_parser = (function() {
+    function _is_type(line, type) {
+        return null != line && type == line.type;
+    }
+
+    function _is_not_type(line, type) {
+        return null != line && type != line.type;
+    }
+
+    function empty_line(lines, idx) {
+        return _is_type(lines[idx], Line.empty) ? 1 : -1;
+    }
+
+    function text_line(lines, idx) {
+        return _is_not_type(lines[idx], Line.empty) ? 1 : -1;
+    }
+
+    function title_line(level) {
+        return function(lines, idx) {
+            return _is_type(lines[idx], 'title_' + level) ? 1 : -1;
+        }
+    }
+
+    function equal_line(lines, idx) {
+        return _is_type(lines[idx], Line.line_equal) ? 1 : -1;
+    }
+
+    function minus_line(line, idx) {
+        return _is_type(lines[idx], Line.line_minus) ? 1 : -1;
+    }
+
+    function dot_line(line, idx) {
+        return _is_type(lines[idx], Line.line_dot) ? 1 : -1;
+    }
+
+    function code_begin_line(line, idx) {
+        return _is_type(lines[idx], Line.code_begin) ? 1 : -1;
+    }
+
+    function code_end_line(line, idx) {
+        return _is_type(lines[idx], Line.code_end) ? 1 : -1;
+    }
+
+    function quote_prefixeded_line(line, idx) {
+        return _is_type(lines[idx], Line.quote_prefixed) ? 1 : -1;
+    }
+
+    function quote_begin_line(line, idx) {
+        return _is_type(lines[idx], Line.quote_begin) ? 1 : -1;
+    }
+
+    function quote_end_line(line, idx) {
+        return _is_type(lines[idx], Line.quote_end) ? 1 : -1;
+    }
+
+    function IS(line_type) {
+        return function(lines, idx) {
+            return (idx < lines.length && lines[idx].type == line_type) ? 1 : -1;
+        }
+    }
+
+    function NOT(line_type) {
+        return function(lines, idx) {
+            return (idx < lines.length && lines[idx].type == line_type) ? -1 : 1;
+        }
+    }
+
+    function OPTIONAL(line_type) {
+        return function(lines, idx) {
+            return (idx < lines.length && lines[idx].type == line_type) ? 1 : 0;
+        }
+    }
+
+    function CONCAT() {
+        var _args = this.arguments;
+
+        return function(lines, idx) {
+            var _idx = idx;
+            for (var i = 0; i < _args.length; ++i) {
+                var n = _args[i](lines, _idx);
+                if (n < 0) {
+                    return -1;
+                }
+                _idx += n;
+            }
+            return _idx - idx;
+        }
+    }
+
+
+    function REPEAT(predicate, min, max) {
+        var _min = (null != min ? min : 1);
+        var _max = (null != max ? max : 1000000);
+
+        return function(lines, idx) {
+            var _idx = idx;
+            var repeats = 0;
+            while (_idx < lines.length && repeats < _max) {
+                var n = predicate(lines, _idx);
+                if (n < 0) {
+                    if (repeats < min) {
+                        return -1;
+                    }
+                    else {
+                        return _idx - idx;
+                    }
+                }
+                else {
+                    ++repeats;
+                    _idx += n;
+                }
+            }
+            return (idx < lines.length && lines[idx].type == line_type) ? 1 : 0;
+        }
+    }
+
+
+    var _meta = [
+        [ 'title_1', IS(Line.title_1) ],
+        [ 'title_2', IS(Line.title_2) ],
+        [ 'title_3', IS(Line.title_3) ],
+        [ 'title_4', IS(Line.title_4) ],
+        [ 'title_1_underlined', CONCAT(
+                                        IS(Line.text), 
+                                        IS(Line.line_equal), 
+                                        IS(Line.empty)
+                                )
+        ],
+        [ 'title_2_underlined', CONCAT(
+                                        IS(Line.text), 
+                                        IS(Line.line_minus), 
+                                        IS(Line.empty)
+                                ) 
+        ],
+        [ 'title_3_underlined', CONCAT(
+                                        IS(Line.text), 
+                                        IS(Line.line_dot), 
+                                        IS(Line.empty)
+                                ) 
+        ],
+        [ 'code', CONCAT(
+                                IS(Line.code_begin), 
+                                NOT(Line.code_end), 
+                                IS(Line.code_end)
+                        ) 
+        ],
+        [ 'prefixed_quote', REPEAT(IS(Line.quote_prefixed), 1) ],
+        [ 'enclosed_quote', CONCAT(
+                                        IS(Line.quote_begin), 
+                                        REPEAT(NOT(Line.quote_end), 0), 
+                                        IS(Line.quote_end)
+                                  ) 
+        ],
+        [ 'table', CONCAT(
+                         IS(Line.table_begin), 
+                         OPTIONAL(Line.table_head), 
+                         REPEAT(IS(Line.table_data), 0), 
+                         IS(Line.table_end)
+                    ) 
+        ],
+        [ 'empty', REPEAT(IS(Line.empty), 1) ],
+        [ 'text', REPEAT(NOT(Line.empty), 1) ]
+    ];
 })();
-*/
 
 function compile(src) {
     var tokens = line_scanner.parse(src);
