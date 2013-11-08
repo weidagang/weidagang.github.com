@@ -30,7 +30,17 @@
             <p><strong>Title</strong> (the num of # doesn't matter)</p>
             <pre><code># Title 1 #
  # Title 2 #
-  # Title 3 #</code></pre>
+  # Title 3 #
+
+Title 1
+=======
+
+Title 2
+-------
+
+Title 3
+.......
+</code></pre>
 
             <p><strong>Emphasis</strong></p>
             <pre><code>**bold**
@@ -75,13 +85,22 @@ so give it a push at least.
         <div id="app">
             <div>
                 <p class="label">Markin Source:</p>
-                <textarea id='mi-src' rows="35" cols="80" name="markin"># Title 1 #
- # Title 2 #
-  # Title 3 #
+                <textarea id='mi-src' rows="35" cols="80" name="markin">Title 1
+=======
+
+Title 2
+-------
+
+Title 3
+.......
 
 Roses are **red**, Violets are __blue__, Tulips are !!yellow!!. I love ~~Tulips~~.
 
-**Code:**
+[Markin Editor](http://weidagang.github.io/markin-editor/) is really cool, check it out here!
+
+&gt; A closed door is not always locked, 
+&gt; so give it a push at least.
+
 ```
 int main() {
     printf("hello world\n");
@@ -90,25 +109,12 @@ int main() {
 
 ``printf()`` is for stdout.
 
-**Quote:**
-&gt; A closed door is not always locked, so give it a push at least.
-
-&gt;&gt;&gt;
-A closed door is not always locked,
-so give it a push at least.
-&gt;&gt;&gt;
-
-**Table:**
 [
     *[ ID, Name, Age ]*
      [ 1, Todd, 31 ]
      [ 2, April, 29 ]
      [ 3, Monad, 1 ]
 ]
-
-**Link:**
-[Markin Editor](http://weidagang.github.io/markin-editor/) is really cool, check it out here!
-
 </textarea>
                 <div id="buttonrow">
                     <input type="submit" name="convert" value="Compile" class="actionbutton" onclick='javascript:convert()'>

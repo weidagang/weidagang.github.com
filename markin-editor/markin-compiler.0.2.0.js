@@ -199,7 +199,6 @@ var block_parser = (function() {
                 }
                 _idx += n;
             }
-            console.log('CONCAT(), idx=' + idx + ', rc=' + (_idx - idx));
             return _idx - idx;
         }
     }
@@ -236,36 +235,21 @@ var block_parser = (function() {
         [ 'title_2', IS(Line.title_2) ],
         [ 'title_3', IS(Line.title_3) ],
         [ 'title_4', IS(Line.title_4) ],
-        [ 'title_1_underlined', CONCAT(
-                                        IS(Line.text), 
-                                        IS(Line.line_equal), 
-                                        IS(Line.empty)
-                                )
-        ],
-        [ 'title_2_underlined', CONCAT(
-                                        IS(Line.text), 
-                                        IS(Line.line_minus), 
-                                        IS(Line.empty)
-                                ) 
-        ],
-        [ 'title_3_underlined', CONCAT(
-                                        IS(Line.text), 
-                                        IS(Line.line_dot), 
-                                        IS(Line.empty)
-                                ) 
-        ],
+        [ 'title_1_underlined', CONCAT(IS(Line.text), IS(Line.line_equal)) ],
+        [ 'title_2_underlined', CONCAT(IS(Line.text), IS(Line.line_minus)) ],
+        [ 'title_3_underlined', CONCAT(IS(Line.text), IS(Line.line_dot)) ],
         [ 'code', CONCAT(
-                                IS(Line.code_begin), 
-                                REPEAT(NOT(Line.code_end), 0), 
-                                IS(Line.code_end)
-                        ) 
+                        IS(Line.code_begin), 
+                        REPEAT(NOT(Line.code_end), 0), 
+                        IS(Line.code_end)
+                    )
         ],
         [ 'prefixed_quote', REPEAT(IS(Line.quote_prefixed), 1) ],
         [ 'enclosed_quote', CONCAT(
-                                        IS(Line.quote_begin), 
-                                        REPEAT(NOT(Line.quote_end), 0), 
-                                        IS(Line.quote_end)
-                                  ) 
+                                    IS(Line.quote_begin),
+                                    REPEAT(NOT(Line.quote_end), 0),
+                                    IS(Line.quote_end)
+                                  )
         ],
         [ 'table', CONCAT(
                          IS(Line.table_begin), 
@@ -291,15 +275,14 @@ var block_parser = (function() {
                 var rule = meta_block[1];
                 var n = rule(lines, idx);
                 if (n > 0) {
-                    console.log('block=' + type + ', from=' + idx + ', to=' + (idx + n));
                     matched = true;
                     blocks.push({ type : type, lines : lines.slice(idx, idx + n) });
                     idx += n;
+                    break;
                 }
             }
 
             if (!matched) {
-                //console.log('NO MATCH: ' + lines[idx].type + ', ' + lines[idx].text);
                 break;
             }
         }
@@ -452,31 +435,73 @@ var html_generator = (function(){
         return buffer.join('');
     }
 
+    function _convert_title(block) {
+        function title_level(line) {
+            var i;
+            var found = false;
+
+            for (i = 0; i < line.length; ++i) {
+                if ('#' == line[i]) {
+                    found = true;
+                    break;
+                }
+                else if (' ' != line[i]) {
+                    break;
+                }
+            }
+            
+            return found ? i + 1 : 0;
+        }
+       
+        var buffer = [];
+        var rline = block.lines[0].text;
+        var level = title_level(rline);
+
+        buffer.push('<h' + level + '>');
+        buffer.push(rline.replace(/^(\s*#+\s*)?/, "").replace(/\s*#+$/, ""));
+        buffer.push('</h' + level + '>');
+
+        return buffer.join('');
+    }
+
+    function _convert_underlined_title(block) {
+        var level = 1;
+        if ('title_1_underlined' == block.type) {
+            level = 1;
+        }
+        else if('title_2_underlined' == block.type) {
+            level = 2;
+        }
+        else if('title_3_underlined' == block.type) {
+            level = 3;
+        }
+        return '<h' + level + '>' + block.lines[0].text + '</h' + level + '>';
+    }
+
+    var _meta = {
+        'text' : _convert_text_block,
+        'code' : _convert_code_block,
+        'enclosed_quote' : _convert_enclosed_quote_block,
+        'prefixed_quote' : _convert_prefixed_quote_block,
+        'table' : _convert_table_block,
+        'title_1' : _convert_title,
+        'title_2' : _convert_title,
+        'title_3' : _convert_title,
+        'title_4' : _convert_title,
+        'title_1_underlined' : _convert_underlined_title,
+        'title_2_underlined' : _convert_underlined_title,
+        'title_3_underlined' : _convert_underlined_title
+    };
+
     function _generate(blocks) {
         var html = [];
         for (var i = 0; i < blocks.length; ++i) {
-            if ('text' == blocks[i].type) {
-                var h = _convert_text_block(blocks[i]);
-                html.push(h);
-            }
-            else if ('code' == blocks[i].type) {
-                var h = _convert_code_block(blocks[i]);
-                html.push(h);
-            }
-            else if ('enclosed_quote' == blocks[i].type) {
-                var h = _convert_enclosed_quote_block(blocks[i]);
-                html.push(h);
-            }
-            else if ('prefixed_quote' == blocks[i].type) {
-                var h = _convert_prefixed_quote_block(blocks[i]);
-                html.push(h);
-            }
-            else if ('table' == blocks[i].type) {
-                var h = _convert_table_block(blocks[i]);
-                html.push(h);
+            var converter = _meta[blocks[i].type];
+            if (null != converter) {
+                html.push(converter(blocks[i]));
             }
         }
-        return html.join('');
+        return html.join('\n');
     }
 
     return { generate : _generate };
@@ -484,19 +509,11 @@ var html_generator = (function(){
 
 function compile(src) {
     var lines = line_scanner.parse(src);
-    for (var i = 0; i < lines.length; ++i) {
-        console.log(lines[i]);
-    }
-
-    console.log('---------------------');
 
     var blocks = block_parser.parse(lines);
-    for (var i = 0; i < blocks.length; ++i) {
-        console.log(blocks[i]);
-    }
 
     var html = html_generator.generate(blocks);
-    console.log(html);
+
     return html;
 }
 
