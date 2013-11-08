@@ -283,7 +283,7 @@ var block_parser = (function() {
             }
 
             if (!matched) {
-                break;
+                lines[idx].type = Line.text;
             }
         }
 
