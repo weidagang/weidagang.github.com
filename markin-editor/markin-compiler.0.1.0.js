@@ -11,7 +11,7 @@
  */
 
 function compile(src) {
-    // split the markdown source into lines
+    // split the markin source into lines
     var lines = src.split('\n');
     
     // organize lines into blocks
