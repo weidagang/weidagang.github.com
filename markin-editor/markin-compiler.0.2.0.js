@@ -45,62 +45,22 @@ var utils = (function() {
 
 var line_scanner = (function() {
     var _meta = [
-        [ Line.empty, _equals('') ],
-        [ Line.title_1, _starts_with('#') ],
-        [ Line.title_2, _starts_with(' #') ],
-        [ Line.title_3, _starts_with('  #') ],
-        [ Line.title_4, _starts_with('   #') ],
-        [ Line.line_equal, _repeats('=', 3) ],
-        [ Line.line_minus, _repeats('-', 3) ],
-        [ Line.line_dot, _repeats('.', 3) ],
-        [ Line.quote_prefixed, _starts_with('> ') ],
-        [ Line.code_multi, _starts_with('```') ],
-        [ Line.quote_multi, _starts_with('>>>')],
-        [ Line.table_begin, _equals('[')],
-        [ Line.table_end, _equals(']')],
-        [ Line.table_head, _enclosed_by('*[', ']*')],
-        [ Line.table_data, _enclosed_by('[', ']')]
+        [ Line.empty, /^$/ ],
+        [ Line.title_1, /^#/ ],
+        [ Line.title_2, /^ #/ ],
+        [ Line.title_3, /^  #/ ],
+        [ Line.title_4, /^   #/ ],
+        [ Line.line_equal, /^===/ ],
+        [ Line.line_minus, /^---/ ],
+        [ Line.line_dot, /^\.\.\./ ],
+        [ Line.quote_prefixed, /^> / ],
+        [ Line.code_multi, /^```/ ],
+        [ Line.quote_multi, /^>>>/ ],
+        [ Line.table_begin, /^\[$/ ],
+        [ Line.table_end, /^\]$/ ],
+        [ Line.table_head, /^  \*\[.*\]\*$/ ],
+        [ Line.table_data, /^   \[.*\]$/ ]
     ];
-    
-    // matches lines that equal to arg
-    function _equals(arg) {
-        return function (line) {
-            return line == arg;
-        };
-    }
-    
-    // matches lines that start with arg
-    function _starts_with(arg) {
-        return function(line) {
-            return null != line && 0 == line.indexOf(arg);
-        }
-    }
-
-    // matches lines which are enclosed by arg1 and arg2
-    function _enclosed_by(arg1, arg2) {
-        return function(line) {
-            var _arg1 = utils.escape_regex(arg1);
-            var _arg2 = utils.escape_regex(arg2);
-            var regex = new RegExp('^\\s*' + _arg1 + '.*' + _arg2 + '\\s*$');
-            return regex.test(line); 
-        }
-    }
-
-    // matches repeats of a symbol
-    function _repeats(symbol, times) {
-        return function (line) {
-            if (null != line && line.length > times) {
-                for (var i = 0; i < line.length; ++i) {
-                    if (line.charAt(i) != symbol) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-    }
-    //// - matcher    
 
     function _parse(src) {
         var tokens = [];
@@ -111,7 +71,7 @@ var line_scanner = (function() {
             var rline = raw_lines[i];
             var token = { type : Line.text, text : rline };   
             for (var j = 0; j < _meta.length; ++j) {
-                if (_meta[j][1](rline)) {
+                if (_meta[j][1].test(rline)) {
                     token.type = _meta[j][0];
                     break;
                 }
