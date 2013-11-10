@@ -14,10 +14,7 @@
 var Line = {
     empty : 'empty',
     text : 'text', 
-    title_1 : 'title1',
-    title_2 : 'title2',
-    title_3 : 'title3',
-    title_4 : 'title4',
+    title : 'title',
     line_equal : 'line_equal',
     line_minus : 'line_minus',
     line_dot : 'line_dot',
@@ -46,10 +43,7 @@ var utils = (function() {
 var line_scanner = (function() {
     var _meta = [
         [ Line.empty, /^$/ ],
-        [ Line.title_1, /^#/ ],
-        [ Line.title_2, /^ #/ ],
-        [ Line.title_3, /^  #/ ],
-        [ Line.title_4, /^   #/ ],
+        [ Line.title, /^ *#/ ],
         [ Line.line_equal, /^===/ ],
         [ Line.line_minus, /^---/ ],
         [ Line.line_dot, /^\.\.\./ ],
@@ -191,10 +185,7 @@ var block_parser = (function() {
     }
 
     var _meta = [
-        [ 'title_1', IS(Line.title_1) ],
-        [ 'title_2', IS(Line.title_2) ],
-        [ 'title_3', IS(Line.title_3) ],
-        [ 'title_4', IS(Line.title_4) ],
+        [ 'title', IS(Line.title) ],
         [ 'title_1_underlined', CONCAT(IS(Line.text), IS(Line.line_equal)) ],
         [ 'title_2_underlined', CONCAT(IS(Line.text), IS(Line.line_minus)) ],
         [ 'title_3_underlined', CONCAT(IS(Line.text), IS(Line.line_dot)) ],
@@ -418,7 +409,7 @@ var html_generator = (function(){
         var level = title_level(rline);
 
         buffer.push('<h' + level + '>');
-        buffer.push(rline.replace(/^(\s*#+\s*)?/, "").replace(/\s*#+$/, ""));
+        buffer.push(rline.replace(/^(\s*#+\s*)?/, "").replace(/\s*#+\s*$/, ""));
         buffer.push('</h' + level + '>');
 
         return buffer.join('');
@@ -444,10 +435,7 @@ var html_generator = (function(){
         'enclosed_quote' : _convert_enclosed_quote_block,
         'prefixed_quote' : _convert_prefixed_quote_block,
         'table' : _convert_table_block,
-        'title_1' : _convert_title,
-        'title_2' : _convert_title,
-        'title_3' : _convert_title,
-        'title_4' : _convert_title,
+        'title' : _convert_title,
         'title_1_underlined' : _convert_underlined_title,
         'title_2_underlined' : _convert_underlined_title,
         'title_3_underlined' : _convert_underlined_title
