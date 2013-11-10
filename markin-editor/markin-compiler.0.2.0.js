@@ -12,26 +12,26 @@
 
 // constants 
 var Line = {
-    empty : 'Empty',
-    text : 'Text', 
-    title_1 : 'Title1',
-    title_2 : 'Title2',
-    title_3 : 'Title3',
-    title_4 : 'Title4',
-    line_equal : 'LineEqual',
-    line_minus : 'LineMinus',
-    line_dot : 'LineDot',
-    quote_prefixed : 'QuotePrefixed',
-    code_multi : 'CodeMulti',
-    code_begin: 'CodeBegin',
-    code_end: 'CodeEnd',
-    quote_multi : 'QuoteMulti',
-    quote_begin : 'QuoteBegin',
-    quote_end : 'QuoteEnd',
-    table_begin : 'TableBegin',
-    table_end : 'TableEnd',
-    table_head : 'TableHead',
-    table_data : 'TableData' 
+    empty : 'empty',
+    text : 'text', 
+    title_1 : 'title1',
+    title_2 : 'title2',
+    title_3 : 'title3',
+    title_4 : 'title4',
+    line_equal : 'line_equal',
+    line_minus : 'line_minus',
+    line_dot : 'line_dot',
+    quote_prefixed : 'quote_prefixed',
+    line_back_quote : 'line_back_quote',
+    code_begin: 'code_begin',
+    code_end: 'code_end',
+    line_greater : 'line_greater',
+    quote_begin : 'quote_begin',
+    quote_end : 'quote_end',
+    table_begin : 'line_open_bracket',
+    table_end : 'line_close_bracket',
+    table_head : 'table_header',
+    table_row : 'table_row' 
 };
 
 // utils
@@ -54,12 +54,12 @@ var line_scanner = (function() {
         [ Line.line_minus, /^---/ ],
         [ Line.line_dot, /^\.\.\./ ],
         [ Line.quote_prefixed, /^> / ],
-        [ Line.code_multi, /^```/ ],
-        [ Line.quote_multi, /^>>>/ ],
+        [ Line.line_back_quote, /^```/ ],
+        [ Line.line_greater, /^>>>/ ],
         [ Line.table_begin, /^\[$/ ],
         [ Line.table_end, /^\]$/ ],
         [ Line.table_head, /^  \*\[.*\]\*$/ ],
-        [ Line.table_data, /^   \[.*\]$/ ]
+        [ Line.table_row, /^   \[.*\]$/ ]
     ];
 
     function _parse(src) {
@@ -83,9 +83,9 @@ var line_scanner = (function() {
         var i = 0;
         var j = 0;
         while (i < tokens.length) {
-            if (Line.code_multi == tokens[i].type) {
+            if (Line.line_back_quote == tokens[i].type) {
                 for (j = i + 1; j < tokens.length; ++j) {
-                    if (Line.code_multi == tokens[j].type) {
+                    if (Line.line_back_quote == tokens[j].type) {
                         break;
                     }
                 }
@@ -100,9 +100,9 @@ var line_scanner = (function() {
                 tokens[i].type = Line.Text;
             }
 
-            if (Line.quote_multi == tokens[i].type) {
+            if (Line.line_greater == tokens[i].type) {
                 for (j = i + 1; j < tokens.length; ++j) {
-                    if (Line.quote_multi == tokens[j].type) {
+                    if (Line.line_greater == tokens[j].type) {
                         break;
                     }
                 }
@@ -214,7 +214,7 @@ var block_parser = (function() {
         [ 'table', CONCAT(
                          IS(Line.table_begin), 
                          OPTIONAL(Line.table_head), 
-                         REPEAT(IS(Line.table_data), 0), 
+                         REPEAT(IS(Line.table_row), 0), 
                          IS(Line.table_end)
                     ) 
         ],
