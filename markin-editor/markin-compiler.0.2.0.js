@@ -37,7 +37,14 @@ var utils = (function() {
         return arg.replace('\\', '\\\\').replace('[', '\\[').replace(']', '\\]').replace('(', '\\(').replace(')', '\\)').replace('*', '\\*');
     }
 
-    return { escape_regex : _escape_regex };
+    function _escape_html(text) {
+        return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    return { 
+        escape_regex : _escape_regex, 
+        escape_html : _escape_html
+    };
 })();
 
 var line_scanner = (function() {
@@ -317,7 +324,7 @@ var html_generator = (function(){
         html.push('<pre>');
         html.push('<code>');
         for (var i = 1; i < block.lines.length - 1; ++i) {
-            html.push(block.lines[i].text + '\n');
+            html.push(utils.escape_html(block.lines[i].text) + '\n');
         }
         html.push('</code>');
         html.push('</pre>');
@@ -328,7 +335,7 @@ var html_generator = (function(){
         var html = []; 
         html.push('<blockquote>');
         for (var i = 1; i < block.lines.length - 1; ++i) {
-            html.push(block.lines[i].text);
+            html.push(utils.escape_html(block.lines[i].text));
             if (i < block.lines.length - 1) {
                 html.push('<br>');
             }
@@ -341,7 +348,7 @@ var html_generator = (function(){
         var html = []; 
         html.push('<blockquote>');
         for (var i = 0; i < block.lines.length; ++i) {
-            html.push(block.lines[i].text.substring(2));
+            html.push(utils.escape_html(block.lines[i].text.substring(2)));
             if (i < block.lines.length - 1) {
                 html.push('<br>');
             }
@@ -461,9 +468,7 @@ var html_generator = (function(){
 
 function compile(src) {
     var lines = line_scanner.parse(src);
-
     var blocks = block_parser.parse(lines);
-
     var html = html_generator.generate(blocks);
 
     return html;
