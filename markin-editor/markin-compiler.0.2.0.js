@@ -329,7 +329,9 @@ var html_generator = (function(){
         html.push('<blockquote>');
         for (var i = 1; i < block.lines.length - 1; ++i) {
             html.push(block.lines[i].text);
-            html.push('<br>');
+            if (i < block.lines.length - 1) {
+                html.push('<br>');
+            }
         }
         html.push('</blockquote>');
         return html.join('');
@@ -340,7 +342,9 @@ var html_generator = (function(){
         html.push('<blockquote>');
         for (var i = 0; i < block.lines.length; ++i) {
             html.push(block.lines[i].text.substring(2));
-            html.push('<br>');
+            if (i < block.lines.length - 1) {
+                html.push('<br>');
+            }
         }
         html.push('</blockquote>');
         return html.join('');
