@@ -20,11 +20,7 @@ var Line = {
     line_dot : 'line_dot',
     quote_prefixed : 'quote_prefixed',
     line_back_quote : 'line_back_quote',
-    code_begin: 'code_begin',
-    code_end: 'code_end',
     line_greater : 'line_greater',
-    quote_begin : 'quote_begin',
-    quote_end : 'quote_end',
     table_begin : 'line_open_bracket',
     table_end : 'line_close_bracket',
     table_head : 'table_header',
@@ -66,7 +62,6 @@ var line_scanner = (function() {
     function _parse(src) {
         var tokens = [];
         
-        // phase 1 scan
         var raw_lines = src.split('\n');
         for (var i = 0; i < raw_lines.length; ++i) {
             var rline = raw_lines[i];
@@ -80,47 +75,6 @@ var line_scanner = (function() {
             tokens.push(token);
         }
         
-        // phase 2 scan
-        var i = 0;
-        var j = 0;
-        while (i < tokens.length) {
-            if (Line.line_back_quote == tokens[i].type) {
-                for (j = i + 1; j < tokens.length; ++j) {
-                    if (Line.line_back_quote == tokens[j].type) {
-                        break;
-                    }
-                }
-
-                if (j < tokens.length) {
-                    tokens[i].type = Line.code_begin;
-                    tokens[j].type = Line.code_end;
-                    i = j + 1;
-                    continue;
-                }
-
-                tokens[i].type = Line.Text;
-            }
-
-            if (Line.line_greater == tokens[i].type) {
-                for (j = i + 1; j < tokens.length; ++j) {
-                    if (Line.line_greater == tokens[j].type) {
-                        break;
-                    }
-                }
-
-                if (j < tokens.length) {
-                    tokens[i].type = Line.quote_begin;
-                    tokens[j].type = Line.quote_end;
-                    i = j + 1;
-                    continue;
-                }
-
-                tokens[i].type = Line.text;
-            }
-
-            ++i;
-        }
-
         return tokens;
     }
 
@@ -164,7 +118,6 @@ var block_parser = (function() {
         }
     }
 
-
     function REPEAT(predicate, min, max) {
         var _min = (null != min ? min : 1);
         var _max = (null != max ? max : 1000000);
@@ -197,16 +150,16 @@ var block_parser = (function() {
         [ 'title_2_underlined', CONCAT(IS(Line.text), IS(Line.line_minus)) ],
         [ 'title_3_underlined', CONCAT(IS(Line.text), IS(Line.line_dot)) ],
         [ 'code', CONCAT(
-                        IS(Line.code_begin), 
-                        REPEAT(NOT(Line.code_end), 0), 
-                        IS(Line.code_end)
+                        IS(Line.line_back_quote), 
+                        REPEAT(NOT(Line.line_back_quote), 0), 
+                        IS(Line.line_back_quote)
                     )
         ],
         [ 'prefixed_quote', REPEAT(IS(Line.quote_prefixed), 1) ],
         [ 'enclosed_quote', CONCAT(
-                                    IS(Line.quote_begin),
-                                    REPEAT(NOT(Line.quote_end), 0),
-                                    IS(Line.quote_end)
+                                    IS(Line.line_greater),
+                                    REPEAT(NOT(Line.line_greater), 0),
+                                    IS(Line.line_greater)
                                   )
         ],
         [ 'table', CONCAT(
@@ -222,25 +175,22 @@ var block_parser = (function() {
 
     function _parse(lines) {
         var blocks = [];
-
         var idx = 0;
-        while (idx < lines.length) {
-            var matched = false;
 
+        while (idx < lines.length) {
             for (var i = 0; i < _meta.length; ++i) {
-                var meta_block = _meta[i];
-                var type = meta_block[0];
-                var rule = meta_block[1];
+                var type = _meta[i][0];
+                var rule = _meta[i][1];
                 var n = rule(lines, idx);
                 if (n > 0) {
-                    matched = true;
                     blocks.push({ type : type, lines : lines.slice(idx, idx + n) });
                     idx += n;
                     break;
                 }
             }
-
-            if (!matched) {
+            
+            // no match, change the type of line to Text
+            if (idx < lines.length && i == _meta.length) {
                 lines[idx].type = Line.text;
             }
         }
