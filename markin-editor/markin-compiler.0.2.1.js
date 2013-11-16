@@ -1,13 +1,13 @@
 /*
- * markin-compiler.js v0.2.0
+ * markin-compiler.js v0.2.1
  * http://weidagang.github.io/markin-editor
  *
- * Copyright 2011, dagang.wei 
+ * Copyright 2013, dagang.wei 
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * 
  * Contact: weidagang@gmail.com
  *
- * Date: 2013-11-06
+ * Date: 2013-11-16
  */
 
 // constants 
@@ -43,8 +43,9 @@ var utils = (function() {
     };
 })();
 
+// lexer
 var line_scanner = (function() {
-    var _meta = [
+    var _lex = [
         [ Line.empty, /^$/ ],
         [ Line.title, /^ *#/ ],
         [ Line.line_equal, /^===/ ],
@@ -66,9 +67,9 @@ var line_scanner = (function() {
         for (var i = 0; i < raw_lines.length; ++i) {
             var rline = raw_lines[i];
             var token = { type : Line.text, text : rline };   
-            for (var j = 0; j < _meta.length; ++j) {
-                if (_meta[j][1].test(rline)) {
-                    token.type = _meta[j][0];
+            for (var j = 0; j < _lex.length; ++j) {
+                if (_lex[j][1].test(rline)) {
+                    token.type = _lex[j][0];
                     break;
                 }
             }
@@ -83,6 +84,7 @@ var line_scanner = (function() {
     };
 })();
 
+
 var block_parser = (function() {
     function IS(line_type) {
         return function(lines, idx) {
@@ -94,6 +96,10 @@ var block_parser = (function() {
         return function(lines, idx) {
             return (idx < lines.length && lines[idx].type == line_type) ? -1 : 1;
         }
+    }
+
+    function ANY(lines, idx) {
+            return (idx < lines.length) ? 1 : -1;
     }
 
     function OPTIONAL(line_type) {
@@ -144,7 +150,7 @@ var block_parser = (function() {
         }
     }
 
-    var _meta = [
+    var _grammar = [
         [ 'title', IS(Line.title) ],
         [ 'title_1_underlined', CONCAT(IS(Line.text), IS(Line.line_equal)) ],
         [ 'title_2_underlined', CONCAT(IS(Line.text), IS(Line.line_minus)) ],
@@ -170,7 +176,7 @@ var block_parser = (function() {
                     ) 
         ],
         [ 'empty', REPEAT(IS(Line.empty), 1) ],
-        [ 'text', REPEAT(IS(Line.text), 1) ]
+        [ 'text', CONCAT(ANY, REPEAT(IS(Line.text), 0)) ]
     ];
 
     function _parse(lines) {
@@ -178,22 +184,15 @@ var block_parser = (function() {
         var idx = 0;
 
         while (idx < lines.length) {
-            console.log("Line idx=" + idx + ", text=" + lines[idx].text);
-            for (var i = 0; i < _meta.length; ++i) {
-                var type = _meta[i][0];
-                var rule = _meta[i][1];
-                console.log("Rule i=" + i+ ", type=" + type);
-                var n = rule(lines, idx);
-                if (n > 0) {
-                    blocks.push({ type : type, lines : lines.slice(idx, idx + n) });
-                    idx += n;
+            for (var i = 0; i < _grammar.length; ++i) {
+                var type = _grammar[i][0];
+                var rule = _grammar[i][1];
+                var delta = rule(lines, idx);
+                if (delta  > 0) {
+                    blocks.push({ type : type, lines : lines.slice(idx, idx + delta) });
+                    idx += delta;
                     break;
                 }
-            }
-            
-            // no match, change the type of line to Text
-            if (idx < lines.length && i == _meta.length) {
-                lines[idx].type = Line.text;
             }
         }
 
