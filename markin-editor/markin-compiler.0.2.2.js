@@ -222,6 +222,7 @@ var block_parser = (function() {
     
     function _parse(lines) {
         var r = $('article').call(_grammar, lines, 0);
+        console.log(r);
         return r;
     }
 
@@ -427,6 +428,7 @@ var html_generator = (function(){
 
 function compile(src) {
     var lines = line_scanner.parse(src);
+    console.log(lines);
     var ast = block_parser.parse(lines);
     var html = html_generator.generate(ast);
 
