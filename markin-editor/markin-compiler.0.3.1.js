@@ -1,5 +1,5 @@
 /*
- * markin-compiler.js v0.2.2
+ * markin-compiler.js v0.3.1
  * http://weidagang.github.io/markin-editor
  *
  * Copyright 2013, dagang.wei 
@@ -7,7 +7,7 @@
  * 
  * Contact: weidagang@gmail.com
  *
- * Date: 2013-11-17
+ * Date: 2013-11-28
  */
 
 // constants 
@@ -230,6 +230,7 @@ var block_parser = (function() {
 
 var html_generator = (function(){
     var _lex = { 
+        'image' : ['!\\[([^\\]]+?)\\]\\(([^\)]+?)\\)', '<img src="$2" alt="$1"/>'],
         'link' : ['\\[([^\\]]+?)\\]\\(([^\)]+?)\\)', '<a href="$2">$1</a>'],
         'bold' : ['\\*\\*(.*?)\\*\\*', '<strong>$1</strong>'],
         'italic' : ['~~(.*?)~~', '<i>$1</i>'],
