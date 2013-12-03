@@ -10,6 +10,13 @@
  * Date: 2013-12-03
  */
 
+// debug switches
+var Debug = {
+    line_scanner : false,
+    block_scanner : false,
+    html_generator : false
+};
+
 // constants 
 var Line = {
     empty : 'empty',
@@ -19,6 +26,7 @@ var Line = {
     minus : 'minus',
     dots : 'dots',
     quote_prefixed : 'quote_prefixed',
+    minus_enclosed : 'minus_enclosed',
     line_back_quote : 'line_back_quote',
     line_greater : 'line_greater',
     table_begin : 'line_open_bracket',
@@ -52,6 +60,7 @@ var line_scanner = (function() {
         [ Line.minus, /^---/ ],
         [ Line.dots, /^\.\.\./ ],
         [ Line.quote_prefixed, /^> / ],
+        [ Line.minus_enclosed, /^\s*-- (.*) --$/ ],
         [ Line.line_back_quote, /^```/ ],
         [ Line.line_greater, /^>>>/ ],
         [ Line.table_begin, /^\[$/ ],
@@ -190,6 +199,7 @@ var block_parser = (function() {
                             $('enclosed_quote'),
                             $('table'),
                             $('title'),
+                            $('single_line_center'),
                             $('empty'),
                             $('text')
                         ),
@@ -204,6 +214,7 @@ var block_parser = (function() {
                    IS(Line.line_back_quote)
                ),
         'prefixed_quote' : REPEAT(IS(Line.quote_prefixed), 1),
+        'single_line_center' : IS(Line.minus_enclosed),
         'enclosed_quote' : SEQUNCE(
                              IS(Line.line_greater),
                                  REPEAT(NOT(Line.line_greater), 0),
@@ -299,6 +310,12 @@ var html_generator = (function(){
         });
     }
 
+    function _convert_single_line_center_block(ast) {
+        return _convert(_tokens_of(ast), '<p style="text-align:center">', '</p>', '', function(text) {
+            return _convert_text_line(text.replace(/^\s*-- (.*?) --$/, '$1'));
+        });
+    }
+
     function _convert_table_block(ast) {
         var buffer = [];
         var lines = _lines_of(ast);
@@ -361,6 +378,7 @@ var html_generator = (function(){
         'code' : _convert_code_block,
         'enclosed_quote' : _convert_enclosed_quote_block,
         'prefixed_quote' : _convert_prefixed_quote_block,
+        'single_line_center' : _convert_single_line_center_block,
         'table' : _convert_table_block,
         'title' : _convert_title,
         'title_1_underlined' : _convert_underlined_title,
@@ -388,7 +406,15 @@ var html_generator = (function(){
 
 function compile(src) {
     var lines = line_scanner.parse(src);
+    if (Debug.line_scanner) {
+        console.log("Line analysis result:");
+        console.log(lines);
+    }
     var ast = block_parser.parse(lines);
+    if (Debug.block_scanner) {
+        console.log("Block analysis result:");
+        console.log(ast);
+    }
     var html = html_generator.generate(ast);
 
     return html;
