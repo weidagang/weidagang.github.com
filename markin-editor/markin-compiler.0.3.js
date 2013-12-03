@@ -1,5 +1,5 @@
 /*
- * markin-compiler.js v0.2.2
+ * markin-compiler.js v0.3.2
  * http://weidagang.github.io/markin-editor
  *
  * Copyright 2013, dagang.wei 
@@ -7,7 +7,7 @@
  * 
  * Contact: weidagang@gmail.com
  *
- * Date: 2013-11-17
+ * Date: 2013-12-03
  */
 
 // constants 
@@ -46,7 +46,7 @@ var utils = (function() {
 // lexer
 var line_scanner = (function() {
     var _lex = [
-        [ Line.empty, /^$/ ],
+        [ Line.empty, /^\s*$/ ],
         [ Line.title, /^ *#/ ],
         [ Line.equals, /^===/ ],
         [ Line.minus, /^---/ ],
@@ -229,59 +229,20 @@ var block_parser = (function() {
 })();
 
 var html_generator = (function(){
+    var _lex = { 
+        'image' : ['!\\[([^\\]]+?)\\]\\(([^\)]+?)\\)', '<img src="$2" alt="$1"/>'],
+        'link' : ['\\[([^\\]]+?)\\]\\(([^\)]+?)\\)', '<a href="$2">$1</a>'],
+        'bold' : ['\\*\\*(.*?)\\*\\*', '<strong>$1</strong>'],
+        'italic' : ['~~(.*?)~~', '<i>$1</i>'],
+        'underline' : ['__(.*?)__', '<u>$1</u>'],
+        'code' : ['``(.*?)``', '<code>$1</code>'],
+        'emphasis' : ['!!(.*?)!!', '<mark>$1</mark>']
+    };
+
     function _convert_text_line(line) {
-        function convert_link(line) {
-            return line.replace(/\[([^\]]+?)\]\(([^\)]+?)\)/g, '<a href="$2">$1</a>');
+        for (var key in _lex) {
+            line = line.replace(new RegExp(_lex[key][0], 'g'), _lex[key][1]);
         }
-
-        function convert_bold(line) {
-            return convert_element(line, '**', 'strong');
-        }
-
-        function convert_italic(line) {
-            return convert_element(line, '~~', 'i');
-        }
-
-        function convert_underline(line) {
-            return convert_element(line, '__', 'u');
-        }
-
-        function convert_code(line) {
-            return convert_element(line, '``', 'code');
-        }
-
-        function convert_emphasis(line) {
-            return convert_element(line, '!!', 'mark');
-        }
-
-        function convert_element(line, mi_symbol, html_tag) {
-            var startIdx = -1;
-            var endIdx = -1;
-            
-            startIdx = line.indexOf(mi_symbol);
-            while (startIdx >= 0) {
-                endIdx = line.indexOf(mi_symbol, startIdx + 2);
-
-                if (endIdx < 0) {
-                    break; 
-                }
-
-                line = line.replace(mi_symbol, '<' + html_tag + '>'); 
-                line = line.replace(mi_symbol, '</' + html_tag + '>'); 
-
-                startIdx = line.indexOf(mi_symbol);
-            }
-            
-            return line;
-        }
-
-        line = convert_link(line);
-        line = convert_bold(line);
-        line = convert_emphasis(line);
-        line = convert_italic(line);
-        line = convert_underline(line);
-        line = convert_code(line);
-
         return line;
     }
 
