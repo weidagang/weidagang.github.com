@@ -1,0 +1,16 @@
+h1 {
+    color: #666;
+}
+
+.left-column {
+    width:50%;
+    margin-left:0;
+    float:left;
+}
+
+.right-column {
+    width:50%;
+    margin-right:0;
+    float:right;
+}
+

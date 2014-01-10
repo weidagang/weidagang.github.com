@@ -180,7 +180,7 @@ a:link {
 
 /* End HTML5 Boilerplate adaptations */
 h1 {
-  font-size: 4.5em;
+  font-size: 3em;
 }
 
 h1, .vcenter {
@@ -194,7 +194,7 @@ h1, .vcenter {
   position: absolute;
   left: 0;
   right: 0;
-  top: 50%;
+  top: 40%;
   -webkit-transform: translate(0, -50%);
   -moz-transform: translate(0, -50%);
   -ms-transform: translate(0, -50%);
@@ -214,7 +214,7 @@ h1, .vcenter {
 }
 
 h2 {
-  font-size: 2.25em;
+  font-size: 1.5em;
   font-weight: bold;
   padding-top: .5em;
   margin: 0 0 .66666em 0;

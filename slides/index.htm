@@ -20,6 +20,7 @@
 
   <!-- Style theme. More available in /themes/style/ or create your own. -->
   <link rel="stylesheet" media="screen" href="themes/style/swiss.css">
+  <link rel="stylesheet" media="screen" href="themes/style/todd.css">
 
   <!-- Transition theme. More available in /themes/transition/ or create your own. -->
   <link rel="stylesheet" media="screen" href="themes/transition/horizontal-slide.css">
@@ -35,16 +36,87 @@
 
     <!-- Begin slides. Just make elements with a class of slide. -->
 
-    <section class="slide">
-      <h1>Understanding Android with Diagrams</h1>
+    <section class="slide" id='title-page'>
+      <h1>Android Internals</h1>
     </section>
 
-    <section class="slide">
-      <h1>Content</h1>
+    <section class="slide" id='system-architecture'>
+      <h2>System Architecture</h2>
+      <div>
+        <div class="left-column">
+            <img src="./images/system-architecture.jpg" />
+        </div>
+        <div class="right-column">
+            <ul>
+                <li>
+                    <h3>Applications</h3>
+                </li>
+                <li>
+                    <h3>Application Framework</h3>
+                </li>
+                <li>
+                    <h3>Libs and Dalvik VM</h3>
+                <li>
+                    <h3>Linux Kernel</h3>
+                </li>
+            </ul>
+        </div>
+      </div>
     </section>
 
-    <section class="slide">
-      <h1>Here</h1>
+    <section class="slide" id='bootup-process'>
+      <h2>Bootup Process</h2>
+      <div>
+        <div class="left-column">
+            <img src="./images/bootup-process.jpg" />
+        </div>
+        <div class="right-column">
+            <ul>
+                <li>
+                    <h3>Init Process</h3>
+                </li>
+                <li>
+                    <h3>Zygote Process</h3>
+                </li>
+                <li>
+                    <h3>SystemServer Process</h3>
+                </li>
+                <li>
+                    <h3>Launcher</h3>
+                </li>
+            </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id='init-process'>
+      <h2>Bootup Process - Init Process</h2>
+      <div>
+        <div class="left-column">
+            <img src="./images/bootup-process.jpg" />
+        </div>
+        <div class="right-column">
+            <ul>
+                <li>starts SystemProperties service</li>
+                <li>executes init.rc which starts Zygote</li>
+            </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id='zygote-process'>
+      <h2>Bootup Process - Zygote Process</h2>
+      <div>
+        <div class="left-column">
+            <img src="./images/bootup-process.jpg" />
+        </div>
+        <div class="right-column">
+            <ul>
+                <li>starts DVM and preloads classes</li>
+                <li>forks SystemServer</li>
+            </ul>
+        </div>
+      </div>
     </section>
 
     <!-- End slides. -->
