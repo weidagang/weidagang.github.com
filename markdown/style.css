@@ -185,7 +185,7 @@ h2 {
     border-radius: 5px;
 }
 
-textarea[name="markin"], textarea[name="xhtml"] {
+textarea[name="markdown"], textarea[name="xhtml"] {
     width: 98%;
     resize: none;
 }	

@@ -1,6 +1,6 @@
 /*
- * markin-compiler.js v0.3.3
- * http://weidagang.github.io/markin-editor
+ * markdown-compiler.js v0.3.3
+ * http://weidagang.github.io/markdown
  *
  * Copyright 2013, dagang.wei 
  * Dual licensed under the MIT or GPL Version 2 licenses.
