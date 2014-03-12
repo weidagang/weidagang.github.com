@@ -296,7 +296,7 @@ var html_generator = (function(){
 
     function _convert_code_block(ast) {
         var tokens = _tokens_of(ast);
-        return _convert(tokens.slice(1, tokens.length - 1), '<pre><code>', '</pre></code>', '\n', utils.escape_html);
+        return _convert(tokens.slice(1, tokens.length - 1), '<pre><code>', '</code></pre>', '\n', utils.escape_html);
     }
 
     function _convert_enclosed_quote_block(ast) {
