@@ -1,5 +1,5 @@
 /*
- * markdown-compiler.js v0.3.3
+ * markdown-compiler.js v0.3.4
  * http://weidagang.github.io/markdown
  *
  * Copyright 2013, dagang.wei 
@@ -7,7 +7,7 @@
  * 
  * Contact: weidagang@gmail.com
  *
- * Date: 2014-03-01
+ * Date: 2014-04-05
  */
 
 // debug switches
@@ -26,6 +26,7 @@ var Line = {
     minus : 'minus',
     dots : 'dots',
     quote_prefixed : 'quote_prefixed',
+    list_prefixed : 'list_prefixed',
     minus_enclosed : 'minus_enclosed',
     line_back_quote : 'line_back_quote',
     line_quote : 'line_quote',
@@ -60,6 +61,7 @@ var line_scanner = (function() {
         [ Line.minus, /^---/ ],
         [ Line.dots, /^\.\.\./ ],
         [ Line.quote_prefixed, /^> / ],
+        [ Line.list_prefixed, /^\*\s+/ ],
         [ Line.minus_enclosed, /^\s*-- (.*) --$/ ],
         [ Line.line_back_quote, /^```/ ],
         [ Line.line_quote, /^'''/ ],
@@ -197,6 +199,7 @@ var block_parser = (function() {
                             $('code'),
                             $('prefixed_quote'),
                             $('enclosed_quote'),
+                            $('prefixed_list'),
                             $('table'),
                             $('title'),
                             $('single_line_center'),
@@ -214,6 +217,7 @@ var block_parser = (function() {
                    IS(Line.line_back_quote)
                ),
         'prefixed_quote' : REPEAT(IS(Line.quote_prefixed), 1),
+        'prefixed_list' : REPEAT(IS(Line.list_prefixed), 1),
         'single_line_center' : IS(Line.minus_enclosed),
         'enclosed_quote' : SEQUNCE(
                              IS(Line.line_quote),
@@ -310,6 +314,19 @@ var html_generator = (function(){
         });
     }
 
+    function _convert_prefixed_list_block(ast) {
+        var buffer = [];
+        var lines = _lines_of(ast);
+
+        buffer.push('<ul>\n');
+        for (var i = 0; i < lines.length; ++i) {
+            buffer.push('<li>' + lines[i].replace(/^\*\s+(.*?)$/, '$1') + '</li>\n');
+        }
+        buffer.push('</ul>');
+
+        return buffer.join('');
+    }
+
     function _convert_single_line_center_block(ast) {
         return _convert(_tokens_of(ast), '<p style="text-align:center">', '</p>', '', function(text) {
             return _convert_text_line(text.replace(/^\s*-- (.*?) --$/, '$1'));
@@ -378,6 +395,7 @@ var html_generator = (function(){
         'code' : _convert_code_block,
         'enclosed_quote' : _convert_enclosed_quote_block,
         'prefixed_quote' : _convert_prefixed_quote_block,
+        'prefixed_list' : _convert_prefixed_list_block,
         'single_line_center' : _convert_single_line_center_block,
         'table' : _convert_table_block,
         'title' : _convert_title,
