@@ -5,8 +5,10 @@
     <title>Markdown Compiler</title>
     <script src='markdown.0.3.js'></script>
     <script>
+        var gRefreshScheduled = false;
+
         function convert() {
-            var miSrc = document.getElementById('mi-src');
+            var miSrc = document.getElementById('md-src');
             var renderBox = document.getElementById('render-box');
             var htmlSrc = document.getElementById('html-src');
             var previewBox = document.getElementById('preview-box');
@@ -20,6 +22,22 @@
                 renderBox.innerHTML = html;
                 renderBox.style.visibility = 'visible';
             }
+        }
+        
+        // Prevent too frequent refresh of preview
+        function scheduleRefresh() {
+            if (!gRefreshScheduled) {
+                gRefreshScheduled = true;
+                setTimeout(function() { gRefreshScheduled = false; convert(); }, 200);
+            }
+        }
+
+        function onKeyUp() {
+            scheduleRefresh();
+        }
+
+        function onInput() {
+            scheduleRefresh();
         }
     </script>
 </head>
@@ -100,7 +118,7 @@ so give it a push at least.
         <div id="app">
             <div>
                 <p class="label">Markdown Source:</p>
-                <textarea id='mi-src' rows="22" cols="80" name="markdown">Markdown Examples
+                <textarea id='md-src' rows="22" cols="80" name="markdown" onInput="onInput()" onkeyup="onKeyUp()">Markdown Examples
 =================
 
 Roses are **red**, Violets are ~~blue~~, Tulips are !!yellow!!. [Markdown](http://weidagang.github.io/markdown/) is really cool, check it out here! ``printf()`` is for stdout.
@@ -126,8 +144,8 @@ int main() {
 *  Haskell is Powerful
 </textarea>
                 <div id="buttonrow">
-                    <input type="submit" name="convert" value="Compile" class="actionbutton" onclick='javascript:convert()'>
-                </div> <!--buttonrow-->
+                    <input type="submit" name="convert" value="Preview" class="actionbutton" onclick='javascript:convert()'>
+                </div> 
 
             </div>
             
@@ -139,6 +157,9 @@ int main() {
 
         </div> <!-- app -->
     </div> <!-- container -->
-
+    
+    <script>
+        convert(); 
+    </script>
 </body>
 </html>
