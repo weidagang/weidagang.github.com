@@ -7,7 +7,7 @@
  * 
  * Contact: weidagang@gmail.com
  *
- * Date: 2014-04-05
+ * Date: 2014-05-25
  */
 
 // debug switches
@@ -254,7 +254,7 @@ var html_generator = (function(){
         'emphasis' : ['!!(.*?)!!', '<mark>$1</mark>']
     };
 
-    function _convert_text_line(line) {
+    function _convert_embedded_markdown_symbols(line) {
         for (var key in _lex) {
             line = line.replace(new RegExp(_lex[key][0], 'g'), _lex[key][1]);
         }
@@ -295,7 +295,7 @@ var html_generator = (function(){
     }
 
     function _convert_text_block(ast) {
-        return _convert(_tokens_of(ast), '<p>', '</p>', '<br>', _convert_text_line);
+        return _convert(_tokens_of(ast), '<p>', '</p>', '<br>', _convert_embedded_markdown_symbols);
     }
 
     function _convert_code_block(ast) {
@@ -305,12 +305,14 @@ var html_generator = (function(){
 
     function _convert_enclosed_quote_block(ast) {
         var tokens = _tokens_of(ast);
-        return _convert(tokens.slice(1, tokens.length - 1), '<blockquote>', '</blockquote>', '<br>', utils.escape_html);
+        return _convert(tokens.slice(1, tokens.length - 1), '<blockquote>', '</blockquote>', '<br>', function(text) {
+            return _convert_embedded_markdown_symbols(utils.escape_html(text));
+        });
     }
 
     function _convert_prefixed_quote_block(ast) {
         return _convert(_tokens_of(ast), '<blockquote>', '</blockquote>', '<br>', function(text) {
-            return utils.escape_html(text.substring(2));
+            return _convert_embedded_markdown_symbols(utils.escape_html(text.substring(2)));
         });
     }
 
@@ -329,7 +331,7 @@ var html_generator = (function(){
 
     function _convert_single_line_center_block(ast) {
         return _convert(_tokens_of(ast), '<p style="text-align:center">', '</p>', '', function(text) {
-            return _convert_text_line(text.replace(/^\s*-- (.*?) --$/, '$1'));
+            return _convert_embedded_markdown_symbols(text.replace(/^\s*-- (.*?) --$/, '$1'));
         });
     }
 
