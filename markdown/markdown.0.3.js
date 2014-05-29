@@ -1,5 +1,5 @@
 /*
- * markdown-compiler.js v0.3.4
+ * markdown.js v0.3
  * http://weidagang.github.io/markdown
  *
  * Copyright 2013, dagang.wei 
