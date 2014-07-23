@@ -27,7 +27,11 @@
 
 var nl = ie ? '\r' : '\n';
 
-//main function to draw UML sequence diagram
+//The main function to draw UML sequence diagram. 
+//There're 3 major steps:
+//  1) parse the source code into AST;
+//  2) convert the AST to ASCII image objects;
+//  3) convert image objects to HTML;
 function sequence_diagram(in_src) {
 	var ast = parser.sequence_diagram(in_src);
 	//console.log('ast:', ast);
@@ -87,7 +91,8 @@ var html_render = (function() {
 
 		function _traverse(ast) {
 			ast.meta = ast.meta || {};	
-
+            
+            // set index for each object (participant)
 			function _add_obj(obj) {
 				if (null == meta.obj_idxes[obj]) {
 					var idx = meta.objs.length;
@@ -144,7 +149,7 @@ var html_render = (function() {
 
 		_traverse(in_ast);
 
-		//calculate position
+		//calculate position for each object (participant)
 		for (var i = 0; i < meta.objs.length; ++i) {
 			var obj = meta.objs[i];
 			var box_width = _box_width(obj);
@@ -326,8 +331,22 @@ var html_render = (function() {
 	}
 
 	function _note_width(msg) {
-		return msg.length + 4;	
+        var content = ('string' == typeof(msg) ? msg : msg.attr.content);
+        var lines = content.split('\\n');
+        var max = 0;
+        for (var i = 0; i < lines.length; ++i) {
+            if (lines[i].length > max) {
+                max = lines[i].trim().length;
+            }
+        }
+		return max + 4;	
 	}
+
+    function _note_height(msg) {
+        var content = ('string' == typeof(msg) ? msg : msg.attr.content);
+        var lines = content.split('\\n');
+        return lines.length + 2;
+    }
 
 	function _box_width(msg) {
 		return msg.length % 2 ? msg.length + 4 : msg.length + 5;	
@@ -336,11 +355,12 @@ var html_render = (function() {
 	function _msg_width(msg) {
 		return msg.length + 2;	
 	}
-
+    
+    // create image for note
 	function _cnote(msg, is_left) {
 		var i;
 		var x = _note_width(msg);	
-		var y = 3;
+		var y = _note_height(msg);
 		
 		var out_cimage = [];
         
@@ -357,21 +377,29 @@ var html_render = (function() {
 		//up and bottom line
 		for (i = 0; i <= x - 1; ++i) {
 			out_cimage.push(_cpoint('-', xoffset + i, 0, 0)); 
-			out_cimage.push(_cpoint('-', xoffset + i , 2, 0)); 
+			out_cimage.push(_cpoint('-', xoffset + i , y - 1, 0)); 
 		}
         out_cimage.push(_cpoint('\\', xoffset + x - 1, 0, 0));
 
 		//left and right line
-		out_cimage.push(_cpoint('|', xoffset + 0, 1, 0));
-		out_cimage.push(_cpoint('|', xoffset + x - 1, 1, 0));
+        for (i = 0; i < y - 1; ++i) {
+            out_cimage.push(_cpoint('|', xoffset + 0, i + 1, 0));
+            out_cimage.push(_cpoint('|', xoffset + x - 1, i + 1, 0));
+        }
 
-		//name
-		for (i = 1; i < x-1; ++i) {
-			out_cimage.push(_cpoint(' ', xoffset + i, 1, 0)); 
-		}
-		for (i = 2; i < 2 + msg.length; ++i) {
-			out_cimage.push(_cpoint(msg.charAt(i-2), xoffset + i, 1, 0)); 
-		}
+		//content
+        var lines = msg.split('\\n');
+        for (var idx = 0; idx < lines.length; ++idx) {
+            var line = lines[idx].trim();
+
+            for (i = 1; i < x-1; ++i) {
+                out_cimage.push(_cpoint(' ', xoffset + i, idx + 1, 0)); 
+            }
+
+            for (i = 2; i < 2 + line.length; ++i) {
+                out_cimage.push(_cpoint(line.charAt(i-2), xoffset + i, idx + 1, 0)); 
+            }
+        }
                 
 		return out_cimage;
 	}
