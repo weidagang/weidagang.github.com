@@ -256,6 +256,7 @@ var html_generator = (function(){
     };
 
     function _convert_embedded_markdown_symbols(line) {
+        line = utils.escape_html(line);
         for (var key in _lex) {
             line = line.replace(new RegExp(_lex[key][0], 'g'), _lex[key][1]);
         }
